@@ -99,10 +99,19 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       handleTrackEnded();
     };
 
-    const onError = () => {
-      console.warn('Audio playback encountered error, switching to seamless tone stream');
+    const onError = (e: Event) => {
+      console.warn('Audio playback encountered error:', e);
       setIsLoading(false);
-      // Attempt fallback or retry
+      // If error occurs with archive.org download URL, try direct CDN node mirror
+      if (audio.src && audio.src.includes('archive.org/download/')) {
+        const directMirror = audio.src.replace('https://archive.org/download/', 'https://dn710002.ca.archive.org/0/items/');
+        console.log('Switching to archive.org CDN mirror:', directMirror);
+        audio.src = directMirror;
+        audio.load();
+        audio.play().then(() => setIsPlaying(true)).catch(console.warn);
+      } else {
+        setIsPlaying(false);
+      }
     };
 
     audio.addEventListener('timeupdate', onTimeUpdate);
@@ -218,13 +227,40 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
 
     if (audioRef.current) {
-      audioRef.current.src = srcToPlay;
-      audioRef.current.playbackRate = playbackRate;
       try {
+        audioRef.current.pause();
+        audioRef.current.src = srcToPlay;
+        audioRef.current.load();
+        audioRef.current.playbackRate = playbackRate;
         await audioRef.current.play();
         setIsPlaying(true);
       } catch (err) {
-        console.warn('Playback error, user gesture required or network issue:', err);
+        console.warn('Playback error with primary source:', err);
+        // Fallback 1: if offline blob was used and failed, try original audioUrl
+        if (offlineUrl && srcToPlay === offlineUrl) {
+          try {
+            audioRef.current.src = audio.audioUrl;
+            audioRef.current.load();
+            await audioRef.current.play();
+            setIsPlaying(true);
+            return;
+          } catch (eOffline) {
+            console.warn('Offline fallback failed:', eOffline);
+          }
+        }
+        // Fallback 2: if archive.org redirect fails, try direct edge mirror
+        if (srcToPlay.includes('archive.org/download/')) {
+          const directMirror = srcToPlay.replace('https://archive.org/download/', 'https://dn710002.ca.archive.org/0/items/');
+          try {
+            audioRef.current.src = directMirror;
+            audioRef.current.load();
+            await audioRef.current.play();
+            setIsPlaying(true);
+            return;
+          } catch (eMirror) {
+            console.warn('Archive mirror failed:', eMirror);
+          }
+        }
         setIsPlaying(false);
       } finally {
         setIsLoading(false);
@@ -256,9 +292,16 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const resume = () => {
     if (audioRef.current && currentAudio) {
+      if (!audioRef.current.src || audioRef.current.src === '' || audioRef.current.src === window.location.href) {
+        playAudio(currentAudio);
+        return;
+      }
       audioRef.current.play().then(() => {
         setIsPlaying(true);
-      }).catch(console.warn);
+      }).catch((err) => {
+        console.warn('Resume error, refreshing source:', err);
+        playAudio(currentAudio);
+      });
     }
   };
 
@@ -341,11 +384,13 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       try {
         const response = await fetch(audio.audioUrl, { mode: 'cors' });
         if (response.ok) {
-          blob = await response.blob();
+          const fetchedBlob = await response.blob();
+          if (fetchedBlob.size > 1024) {
+            blob = fetchedBlob;
+          }
         }
       } catch (e) {
-        // Fallback placeholder blob for offline record
-        blob = new Blob([new Uint8Array(1024 * 512)], { type: 'audio/mp3' });
+        console.warn('Direct blob fetch failed (likely CORS or network), will save metadata and stream directly:', e);
       }
 
       clearInterval(interval);

@@ -61,7 +61,7 @@ export const SpeakersScreen: React.FC<SpeakersScreenProps> = ({
         category: selectedSpeaker.category,
         description: `${selectedSpeaker.name} এর অত্যন্ত জ্ঞানগর্ভ ও প্রামাণ্য ইসলামিক আলোচনা।`,
         duration: 1040,
-        audioUrl: 'https://download.quranicaudio.com/quran/bangla_translations/001.mp3',
+        audioUrl: 'https://download.quranicaudio.com/quran/mishaari_raashid_al_3afaasee/001.mp3',
         fileSizeMb: 13.8,
         playCount: 18400,
         publishDate: '২০ সেপ্টেম্বর, ২০২৬',
@@ -76,7 +76,7 @@ export const SpeakersScreen: React.FC<SpeakersScreenProps> = ({
         category: selectedSpeaker.category,
         description: `কুরআন ও হাদিসের আলোকে দৈনন্দিন জীবনের বিশুদ্ধ আমল ও সঠিক পথের সন্ধান।`,
         duration: 1180,
-        audioUrl: 'https://download.quranicaudio.com/quran/bangla_translations/036.mp3',
+        audioUrl: 'https://download.quranicaudio.com/quran/mishaari_raashid_al_3afaasee/036.mp3',
         fileSizeMb: 15.2,
         playCount: 22100,
         publishDate: '১৫ সেপ্টেম্বর, ২০২৬'
@@ -90,7 +90,7 @@ export const SpeakersScreen: React.FC<SpeakersScreenProps> = ({
         category: selectedSpeaker.category,
         description: `আল্লাহর ভয়, গুনাহ বর্জন ও ইস্তিগফারের মাধ্যমে কীভাবে আল্লাহর প্রিয় বান্দা হবেন।`,
         duration: 890,
-        audioUrl: 'https://download.quranicaudio.com/quran/bangla_translations/055.mp3',
+        audioUrl: 'https://download.quranicaudio.com/quran/mishaari_raashid_al_3afaasee/055.mp3',
         fileSizeMb: 11.9,
         playCount: 16700,
         publishDate: '১০ সেপ্টেম্বর, ২০২৬'
