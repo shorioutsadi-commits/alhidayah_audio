@@ -31,7 +31,9 @@ export const StorageService = {
   getFavorites(): string[] {
     try {
       const data = localStorage.getItem(FAVORITES_KEY);
-      return data ? JSON.parse(data) : ['aud-abz-1', 'aud-mrm-1'];
+      if (!data) return ['aud-abz-1', 'aud-mrm-1'];
+      const parsed = JSON.parse(data);
+      return Array.isArray(parsed) ? parsed : ['aud-abz-1', 'aud-mrm-1'];
     } catch {
       return ['aud-abz-1', 'aud-mrm-1'];
     }
@@ -61,7 +63,9 @@ export const StorageService = {
   getDownloads(): DownloadedAudio[] {
     try {
       const data = localStorage.getItem(DOWNLOADS_KEY);
-      return data ? JSON.parse(data) : [];
+      if (!data) return [];
+      const parsed = JSON.parse(data);
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
       return [];
     }
@@ -170,7 +174,11 @@ export const StorageService = {
     };
     try {
       const saved = localStorage.getItem(SETTINGS_KEY);
-      return saved ? { ...defaultSettings, ...JSON.parse(saved) } : defaultSettings;
+      if (!saved) return defaultSettings;
+      const parsed = JSON.parse(saved);
+      return (typeof parsed === 'object' && parsed !== null)
+        ? { ...defaultSettings, ...parsed }
+        : defaultSettings;
     } catch {
       return defaultSettings;
     }
@@ -188,7 +196,9 @@ export const StorageService = {
   getHistory(): string[] {
     try {
       const data = localStorage.getItem(HISTORY_KEY);
-      return data ? JSON.parse(data) : [];
+      if (!data) return [];
+      const parsed = JSON.parse(data);
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
       return [];
     }
