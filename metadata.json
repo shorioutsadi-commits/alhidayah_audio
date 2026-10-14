@@ -1,0 +1,6 @@
+{
+  "name": "আল হিদায়াহ অডিও - Al Hidayah Audio",
+  "description": "একটি সমৃদ্ধ ইসলামিক অডিও লাইব্রেরি অ্যাপ - ইসলামিক লেকচার, কুরআন তিলাওয়াত ও আলোচনা শুনুন এবং অফলাইনে ডাউনলোড করুন।",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

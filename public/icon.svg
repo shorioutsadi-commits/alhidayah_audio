@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="128" fill="#ea580c"/>
+  <!-- Islamic Crescent -->
+  <path d="M174 112 C286 112 368 179 368 256 C368 332 286 400 174 400 C215 343 235 287 235 256 C235 225 215 169 174 112 Z" fill="#ffffff"/>
+  <!-- Star / Audio dot -->
+  <circle cx="327" cy="184" r="26" fill="#ffffff"/>
+  <!-- Play/Sound shape -->
+  <path d="M133 348 L133 164 C133 148 148 138 164 148 L307 240 C322 250 322 271 307 281 L164 373 C148 383 133 373 133 358 Z" fill="#ffffff" opacity="0.95"/>
+  <!-- Sound wave arcs -->
+  <path d="M378 194 C404 214 420 234 420 256 C420 277 404 297 378 317" stroke="#ffffff" stroke-width="20" stroke-linecap="round" fill="none" opacity="0.85"/>
+  <path d="M420 153 C455 184 471 220 471 256 C471 292 455 328 420 358" stroke="#ffffff" stroke-width="18" stroke-linecap="round" fill="none" opacity="0.65"/>
+</svg>

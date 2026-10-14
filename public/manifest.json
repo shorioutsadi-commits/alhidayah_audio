@@ -1,0 +1,18 @@
+{
+  "name": "আল হিদায়াহ অডিও - Al Hidayah Audio",
+  "short_name": "আল হিদায়াহ",
+  "description": "একটি সমৃদ্ধ ইসলামিক অডিও লাইব্রেরি অ্যাপ - ইসলামিক লেকচার, কুরআন তিলাওয়াত ও আলোচনা",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#ea580c",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
