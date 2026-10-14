@@ -86,7 +86,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 alt={featuredAudio.speakerName} 
                 className="w-8 h-8 rounded-full border border-white/40 object-cover"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/dr_abu_bakkar_zakaria.png';
+                  const target = e.currentTarget as HTMLImageElement;
+                  target.onerror = null;
+                  target.src = './dr_abu_bakkar_zakaria.png';
                 }}
               />
               <span className="text-xs text-white/90 font-medium truncate max-w-[150px]">
@@ -167,7 +169,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   className="w-full h-full object-cover rounded-full"
                   loading="lazy"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/dr_abu_bakkar_zakaria.png';
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.onerror = null;
+                    target.src = './dr_abu_bakkar_zakaria.png';
                   }}
                 />
               </div>

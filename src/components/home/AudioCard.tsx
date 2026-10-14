@@ -68,7 +68,9 @@ export const AudioCard: React.FC<AudioCardProps> = ({ audio, playlist }) => {
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
             onError={(e) => {
-              (e.target as HTMLImageElement).src = '/dr_abu_bakkar_zakaria.png';
+              const target = e.currentTarget as HTMLImageElement;
+              target.onerror = null;
+              target.src = './dr_abu_bakkar_zakaria.png';
             }}
           />
           

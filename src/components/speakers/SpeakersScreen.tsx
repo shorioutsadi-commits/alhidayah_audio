@@ -117,7 +117,9 @@ export const SpeakersScreen: React.FC<SpeakersScreenProps> = ({
               alt={selectedSpeaker.name} 
               className="w-full h-full object-cover"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = '/dr_abu_bakkar_zakaria.png';
+                const target = e.currentTarget as HTMLImageElement;
+                target.onerror = null;
+                target.src = './dr_abu_bakkar_zakaria.png';
               }}
             />
           </div>
@@ -258,7 +260,9 @@ export const SpeakersScreen: React.FC<SpeakersScreenProps> = ({
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                     loading="lazy"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/dr_abu_bakkar_zakaria.png';
+                      const target = e.currentTarget as HTMLImageElement;
+                      target.onerror = null;
+                      target.src = './dr_abu_bakkar_zakaria.png';
                     }}
                   />
                 </div>

@@ -43,7 +43,9 @@ export const MiniPlayer: React.FC = () => {
                 className="w-full h-full object-cover"
                 loading="lazy"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/dr_abu_bakkar_zakaria.png';
+                  const target = e.currentTarget as HTMLImageElement;
+                  target.onerror = null;
+                  target.src = './dr_abu_bakkar_zakaria.png';
                 }}
               />
               {isPlaying && (

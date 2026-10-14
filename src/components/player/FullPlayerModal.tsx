@@ -147,7 +147,9 @@ export const FullPlayerModal: React.FC = () => {
               alt={currentAudio.speakerName}
               className="w-full h-full object-cover select-none"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = '/dr_abu_bakkar_zakaria.png';
+                const target = e.currentTarget as HTMLImageElement;
+                target.onerror = null;
+                target.src = './dr_abu_bakkar_zakaria.png';
               }}
             />
 
