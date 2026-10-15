@@ -3,6 +3,7 @@ import { X, Info, Heart, ShieldCheck, ExternalLink, BookOpen, Layers, Compass, S
 import { Logo } from '../common/Logo';
 import { OTHER_APPS_DATA } from '../../data/mockAudioData';
 import { toBengaliNumber } from '../../utils/bengaliUtils';
+import { useAudioPlayer } from '../../context/AudioPlayerContext';
 
 interface AboutModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({
   onClose,
   initialTab = 'about'
 }) => {
+  const { showToast } = useAudioPlayer();
   const [activeTab, setActiveTab] = React.useState<'about' | 'apps'>(initialTab);
 
   React.useEffect(() => {
@@ -153,7 +155,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({
                   </div>
 
                   <button
-                    onClick={() => alert(`'${app.name}' অ্যাপটি গুগল প্লে স্টোরে শীঘ্রই আসছে!`)}
+                    onClick={() => showToast(`'${app.name}' অ্যাপটি গুগল প্লে স্টোরে শীঘ্রই আসছে!`, 'info')}
                     className="p-2 text-stone-400 hover:text-orange-600 hover:bg-white rounded-xl transition-colors shrink-0"
                     title="ইনস্টল করুন"
                   >

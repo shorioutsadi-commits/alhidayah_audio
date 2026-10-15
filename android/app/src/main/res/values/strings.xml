@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">আল হিদায়াহ অডিও - Al Hidayah Audio</string>
+    <string name="title_activity_main">আল হিদায়াহ অডিও - Al Hidayah Audio</string>
+    <string name="package_name">com.alhidayah.audio</string>
+    <string name="custom_url_scheme">com.alhidayah.audio</string>
+</resources>

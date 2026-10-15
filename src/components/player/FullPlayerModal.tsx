@@ -46,7 +46,8 @@ export const FullPlayerModal: React.FC = () => {
     isDownloaded, 
     downloadProgress,
     isFullPlayerOpen, 
-    setIsFullPlayerOpen 
+    setIsFullPlayerOpen,
+    showToast
   } = useAudioPlayer();
 
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
@@ -71,7 +72,7 @@ export const FullPlayerModal: React.FC = () => {
       }
     } else {
       navigator.clipboard?.writeText(window.location.href);
-      alert('অডিও লিংক কপি করা হয়েছে!');
+      showToast('অডিও লিংক ক্লিপবোর্ডে কপি করা হয়েছে!', 'success');
     }
   };
 

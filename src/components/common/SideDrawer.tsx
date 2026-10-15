@@ -41,7 +41,7 @@ export const SideDrawer: React.FC<SideDrawerProps> = ({
   onOpenInstallModal,
   onOpenSleepTimer
 }) => {
-  const { downloads, favorites, sleepTimerMinutes } = useAudioPlayer();
+  const { downloads, favorites, sleepTimerMinutes, showToast } = useAudioPlayer();
 
   if (!isOpen) return null;
 
@@ -63,7 +63,7 @@ export const SideDrawer: React.FC<SideDrawerProps> = ({
       }
     } else {
       navigator.clipboard?.writeText(window.location.href);
-      alert('অ্যাপের লিংক ক্লিপবোর্ডে কপি করা হয়েছে!');
+      showToast('অ্যাপের লিংক ক্লিপবোর্ডে কপি করা হয়েছে!', 'success');
     }
   };
 

@@ -1,7 +1,9 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { AudioItem, DownloadedAudio, PlayMode, PlayerSettings } from '../types/audio';
 import { StorageService } from '../services/storageService';
 import { AUDIOS_DATA } from '../data/mockAudioData';
+import { Network } from '@capacitor/network';
+import { ToastMessage, Toast } from '../components/common/Toast';
 
 interface AudioPlayerContextType {
   currentAudio: AudioItem | null;
@@ -20,9 +22,11 @@ interface AudioPlayerContextType {
   downloadProgress: { [id: string]: number };
   queue: AudioItem[];
   settings: PlayerSettings;
+  isOnline: boolean;
+  toast: ToastMessage | null;
   
   // Actions
-  playAudio: (audio: AudioItem, newQueue?: AudioItem[]) => void;
+  playAudio: (audio: AudioItem, newQueue?: AudioItem[]) => Promise<void>;
   togglePlay: () => void;
   pause: () => void;
   resume: () => void;
@@ -41,6 +45,7 @@ interface AudioPlayerContextType {
   isDownloaded: (id: string) => boolean;
   setIsFullPlayerOpen: (open: boolean) => void;
   updateSettings: (newSettings: Partial<PlayerSettings>) => void;
+  showToast: (text: string, type?: 'info' | 'success' | 'warning' | 'error') => void;
 }
 
 const AudioPlayerContext = createContext<AudioPlayerContextType | undefined>(undefined);
@@ -57,22 +62,78 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [sleepTimerMinutes, setSleepTimerMinutes] = useState<number | null>(null);
   const [sleepTimerRemaining, setSleepTimerRemaining] = useState<number | null>(null);
   const [isFullPlayerOpen, setIsFullPlayerOpen] = useState<boolean>(false);
+  const [isOnline, setIsOnline] = useState<boolean>(typeof navigator !== 'undefined' ? navigator.onLine : true);
+  const [toast, setToast] = useState<ToastMessage | null>(null);
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   const [favorites, setFavorites] = useState<string[]>([]);
   const [downloads, setDownloads] = useState<DownloadedAudio[]>([]);
   const [downloadProgress, setDownloadProgress] = useState<{ [id: string]: number }>({});
   const [queue, setQueue] = useState<AudioItem[]>(AUDIOS_DATA);
-  const [settings, setSettings] = useState<PlayerSettings>(StorageService.getSettings());
+  const [settings, setSettings] = useState<PlayerSettings>(() => StorageService.getSettings());
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const sleepTimerIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const synthAudioRef = useRef<{ ctx: AudioContext; osc: OscillatorNode; gain: GainNode } | null>(null);
 
-  // Initialize storage
+  const showToast = useCallback((text: string, type: 'info' | 'success' | 'warning' | 'error' = 'info') => {
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+    }
+    setToast({ id: String(Date.now()), type, text });
+    toastTimeoutRef.current = setTimeout(() => {
+      setToast(null);
+    }, 3800);
+  }, []);
+
+  // Monitor network status with Capacitor Network + browser events
   useEffect(() => {
-    setFavorites(StorageService.getFavorites());
-    setDownloads(StorageService.getDownloads());
-    setSettings(StorageService.getSettings());
+    try {
+      Network.getStatus().then((status) => {
+        setIsOnline(status.connected);
+      }).catch(() => {
+        setIsOnline(typeof navigator !== 'undefined' ? navigator.onLine : true);
+      });
+
+      const handleStatusChange = (status: { connected: boolean }) => {
+        setIsOnline(status.connected);
+        if (!status.connected) {
+          showToast('ইন্টারনেট সংযোগ বিচ্ছিন্ন — সংরক্ষিত অডিও শুনুন', 'warning');
+        }
+      };
+
+      const pluginHandle = Network.addListener('networkStatusChange', handleStatusChange);
+
+      const handleWindowOnline = () => {
+        setIsOnline(true);
+        showToast('ইন্টারনেট সংযোগ পুনঃস্থাপিত হয়েছে', 'success');
+      };
+      const handleWindowOffline = () => {
+        setIsOnline(false);
+        showToast('ইন্টারনেট সংযোগ বিচ্ছিন্ন — অফলাইন মোড চালু', 'warning');
+      };
+
+      window.addEventListener('online', handleWindowOnline);
+      window.addEventListener('offline', handleWindowOffline);
+
+      return () => {
+        pluginHandle.then(h => h.remove()).catch(() => {});
+        window.removeEventListener('online', handleWindowOnline);
+        window.removeEventListener('offline', handleWindowOffline);
+      };
+    } catch {
+      // Fallback
+    }
+  }, [showToast]);
+
+  // Initialize storage safely
+  useEffect(() => {
+    try {
+      setFavorites(StorageService.getFavorites());
+      setDownloads(StorageService.getDownloads());
+      setSettings(StorageService.getSettings());
+    } catch (e) {
+      console.warn('Storage initial load error:', e);
+    }
 
     // Create audio element
     const audio = new Audio();
@@ -84,7 +145,7 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     };
 
     const onLoadedMetadata = () => {
-      setDuration(audio.duration || currentAudio?.duration || 0);
+      setDuration(audio.duration || 0);
       setIsLoading(false);
     };
 
@@ -100,17 +161,25 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     };
 
     const onError = (e: Event) => {
-      console.warn('Audio playback encountered error:', e);
+      console.warn('Audio element error event:', e);
       setIsLoading(false);
       // If error occurs with archive.org download URL, try direct CDN node mirror
       if (audio.src && audio.src.includes('archive.org/download/')) {
         const directMirror = audio.src.replace('https://archive.org/download/', 'https://dn710002.ca.archive.org/0/items/');
-        console.log('Switching to archive.org CDN mirror:', directMirror);
+        console.log('Switching to archive.org direct CDN mirror:', directMirror);
         audio.src = directMirror;
-        audio.load();
-        audio.play().then(() => setIsPlaying(true)).catch(console.warn);
+        audio.play().then(() => setIsPlaying(true)).catch((err) => {
+          console.warn('Mirror playback failed:', err);
+          setIsPlaying(false);
+          showToast('অডিও লোড করা যায়নি — ইন্টারনেট সংযোগ পরীক্ষা করুন', 'error');
+        });
       } else {
         setIsPlaying(false);
+        if (!navigator.onLine) {
+          showToast('ইন্টারনেট নেই — অডিওটি শুনতে ডাউনলোড করুন', 'warning');
+        } else {
+          showToast('অডিও প্লেব্যাকের সময় একটি সমস্যা হয়েছে', 'error');
+        }
       }
     };
 
@@ -132,32 +201,35 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       audio.removeEventListener('error', onError);
       audio.pause();
     };
-  }, []);
+  }, [showToast]);
 
   // Update MediaSession on track change
   useEffect(() => {
     if (!currentAudio) return;
 
     if ('mediaSession' in navigator) {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: currentAudio.title,
-        artist: currentAudio.speakerName,
-        album: 'আল হিদায়াহ অডিও (Al Hidayah)',
-        artwork: [
-          { src: currentAudio.speakerImage, sizes: '512x512', type: 'image/jpeg' }
-        ]
-      });
+      try {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: currentAudio.title,
+          artist: currentAudio.speakerName,
+          album: 'আল হিদায়াহ অডিও (Al Hidayah)',
+          artwork: [
+            { src: currentAudio.speakerImage, sizes: '512x512', type: 'image/jpeg' }
+          ]
+        });
 
-      navigator.mediaSession.setActionHandler('play', () => resume());
-      navigator.mediaSession.setActionHandler('pause', () => pause());
-      navigator.mediaSession.setActionHandler('previoustrack', () => prevTrack());
-      navigator.mediaSession.setActionHandler('nexttrack', () => nextTrack());
-      navigator.mediaSession.setActionHandler('seekbackward', () => skipSeconds(-10));
-      navigator.mediaSession.setActionHandler('seekforward', () => skipSeconds(10));
+        navigator.mediaSession.setActionHandler('play', () => resume());
+        navigator.mediaSession.setActionHandler('pause', () => pause());
+        navigator.mediaSession.setActionHandler('previoustrack', () => prevTrack());
+        navigator.mediaSession.setActionHandler('nexttrack', () => nextTrack());
+        navigator.mediaSession.setActionHandler('seekbackward', () => skipSeconds(-10));
+        navigator.mediaSession.setActionHandler('seekforward', () => skipSeconds(10));
+      } catch (e) {
+        console.warn('MediaSession setup note:', e);
+      }
     }
   }, [currentAudio]);
 
-  // Handle Track Ended with respect to PlayMode
   const handleTrackEnded = () => {
     if (playMode === 'repeat-one') {
       if (audioRef.current) {
@@ -195,6 +267,7 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
           }
           pause();
           setSleepTimerMinutes(null);
+          showToast('স্লিপ টাইমার শেষ — অডিও বিরতি দেওয়া হয়েছে', 'info');
           return null;
         }
         return prev - 1;
@@ -206,7 +279,7 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
         clearInterval(sleepTimerIntervalRef.current);
       }
     };
-  }, [sleepTimerMinutes]);
+  }, [sleepTimerMinutes, showToast]);
 
   const playAudio = async (audio: AudioItem, newQueue?: AudioItem[]) => {
     if (newQueue && newQueue.length > 0) {
@@ -219,33 +292,46 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
     StorageService.addToHistory(audio.id);
 
-    // Check if offline version exists
-    let srcToPlay = audio.audioUrl;
-    const offlineUrl = await StorageService.getOfflineAudioUrl(audio.id);
-    if (offlineUrl) {
-      srcToPlay = offlineUrl;
+    // Rule 1: Check if audio is downloaded locally
+    const isLocal = StorageService.isDownloaded(audio.id);
+    let srcToPlay: string | null = null;
+
+    if (isLocal) {
+      srcToPlay = await StorageService.getOfflineAudioUrl(audio.id);
+      if (srcToPlay) {
+        showToast('অফলাইনে সংরক্ষিত কপি বাজানো হচ্ছে', 'info');
+      }
+    }
+
+    // Rule 2 & 3: If not downloaded, check network connectivity
+    if (!srcToPlay) {
+      if (!isOnline) {
+        setIsLoading(false);
+        setIsPlaying(false);
+        showToast('ইন্টারনেট সংযোগ নেই — এই অডিওটি শুনতে ইন্টারনেট অথবা ডাউনলোড প্রয়োজন', 'warning');
+        return;
+      }
+      srcToPlay = audio.audioUrl;
     }
 
     if (audioRef.current) {
       try {
         audioRef.current.pause();
         audioRef.current.src = srcToPlay;
-        audioRef.current.load();
         audioRef.current.playbackRate = playbackRate;
         await audioRef.current.play();
         setIsPlaying(true);
       } catch (err) {
-        console.warn('Playback error with primary source:', err);
-        // Fallback 1: if offline blob was used and failed, try original audioUrl
-        if (offlineUrl && srcToPlay === offlineUrl) {
+        console.warn('Playback error with source:', err);
+        // Fallback 1: if offline blob was used and failed, try original audioUrl if online
+        if (isLocal && isOnline) {
           try {
             audioRef.current.src = audio.audioUrl;
-            audioRef.current.load();
             await audioRef.current.play();
             setIsPlaying(true);
             return;
           } catch (eOffline) {
-            console.warn('Offline fallback failed:', eOffline);
+            console.warn('Fallback online stream failed:', eOffline);
           }
         }
         // Fallback 2: if archive.org redirect fails, try direct edge mirror
@@ -253,7 +339,6 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
           const directMirror = srcToPlay.replace('https://archive.org/download/', 'https://dn710002.ca.archive.org/0/items/');
           try {
             audioRef.current.src = directMirror;
-            audioRef.current.load();
             await audioRef.current.play();
             setIsPlaying(true);
             return;
@@ -262,6 +347,7 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
           }
         }
         setIsPlaying(false);
+        showToast('অডিও প্লেব্যাকের সময় ত্রুটি হয়েছে', 'error');
       } finally {
         setIsLoading(false);
       }
@@ -356,6 +442,8 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const toggleFavorite = (id: string) => {
     const updated = StorageService.toggleFavorite(id);
     setFavorites(updated);
+    const isNowFav = updated.includes(id);
+    showToast(isNowFav ? 'পছন্দের তালিকায় যুক্ত হয়েছে' : 'পছন্দের তালিকা থেকে সরানো হয়েছে', 'success');
   };
 
   const isFavorite = (id: string): boolean => {
@@ -364,22 +452,28 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const downloadAudio = async (audio: AudioItem) => {
     if (StorageService.isDownloaded(audio.id)) {
+      showToast('এই অডিওটি ইতিমধ্যেই ডাউনলোড করা আছে', 'info');
       return;
     }
 
-    setDownloadProgress(prev => ({ ...prev, [audio.id]: 10 }));
+    if (!isOnline) {
+      showToast('ডাউনলোড করতে ইন্টারনেট সংযোগ প্রয়োজন', 'warning');
+      return;
+    }
+
+    setDownloadProgress(prev => ({ ...prev, [audio.id]: 15 }));
+    showToast(`'${audio.title}' ডাউনলোড শুরু হচ্ছে...`, 'info');
 
     try {
-      // Simulate stepped progress for user feedback and fetch blob
-      let progress = 10;
-      const interval = setInterval(() => {
-        progress += 20;
-        if (progress <= 90) {
+      let progress = 15;
+      const progressTimer = setInterval(() => {
+        progress += 15;
+        if (progress <= 85) {
           setDownloadProgress(prev => ({ ...prev, [audio.id]: progress }));
         }
-      }, 300);
+      }, 400);
 
-      // Fetch real audio data
+      // Fetch actual audio binary data
       let blob: Blob | undefined;
       try {
         const response = await fetch(audio.audioUrl, { mode: 'cors' });
@@ -390,53 +484,66 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
           }
         }
       } catch (e) {
-        console.warn('Direct blob fetch failed (likely CORS or network), will save metadata and stream directly:', e);
+        console.warn('CORS or direct fetch error during download, trying fallback node:', e);
+        if (audio.audioUrl.includes('archive.org/download/')) {
+          const directMirror = audio.audioUrl.replace('https://archive.org/download/', 'https://dn710002.ca.archive.org/0/items/');
+          try {
+            const resp2 = await fetch(directMirror, { mode: 'cors' });
+            if (resp2.ok) {
+              blob = await resp2.blob();
+            }
+          } catch (e2) {
+            console.warn('Mirror download failed:', e2);
+          }
+        }
       }
 
-      clearInterval(interval);
-      setDownloadProgress(prev => ({ ...prev, [audio.id]: 100 }));
+      clearInterval(progressTimer);
+      setDownloadProgress(prev => ({ ...prev, [audio.id]: 95 }));
 
-      const downloaded = await StorageService.saveDownload(audio, blob);
+      // Save to persistent storage (Android filesystem + IndexedDB + Cache)
+      await StorageService.saveDownload(audio, blob);
       setDownloads(StorageService.getDownloads());
 
-      // Device file download trigger so it saves directly into Android/PC Downloads folder
-      try {
-        const a = document.createElement('a');
-        a.href = audio.audioUrl;
-        a.download = `${audio.title.replace(/[\/\\?%*:|"<>]/g, '_')}.mp3`;
-        a.target = '_blank';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } catch (e) {
-        console.log('Direct device download trigger note:', e);
-      }
+      setDownloadProgress(prev => ({ ...prev, [audio.id]: 100 }));
+      showToast(`'${audio.title}' অফলাইনে সংরক্ষিত হয়েছে`, 'success');
 
       setTimeout(() => {
         setDownloadProgress(prev => {
-          const updated = { ...prev };
-          delete updated[audio.id];
-          return updated;
+          const copy = { ...prev };
+          delete copy[audio.id];
+          return copy;
         });
       }, 1000);
     } catch (err) {
-      console.error('Download error', err);
+      console.error('Download failure:', err);
+      showToast('ডাউনলোড ব্যর্থ হয়েছে — ইন্টারনেট পরীক্ষা করুন', 'error');
       setDownloadProgress(prev => {
-        const updated = { ...prev };
-        delete updated[audio.id];
-        return updated;
+        const copy = { ...prev };
+        delete copy[audio.id];
+        return copy;
       });
     }
   };
 
   const deleteDownload = async (id: string) => {
-    await StorageService.removeDownload(id);
-    setDownloads(StorageService.getDownloads());
+    try {
+      await StorageService.removeDownload(id);
+      setDownloads(StorageService.getDownloads());
+      showToast('অফলাইন ডাউনলোড মুছে ফেলা হয়েছে', 'info');
+    } catch (e) {
+      console.error('Failed to delete download:', e);
+    }
   };
 
   const clearAllDownloads = async () => {
-    await StorageService.clearAllDownloads();
-    setDownloads([]);
+    try {
+      await StorageService.clearAllDownloads();
+      setDownloads([]);
+      showToast('সকল ডাউনলোড সফলভাবে মুছে ফেলা হয়েছে', 'info');
+    } catch (e) {
+      console.error('Failed to clear downloads:', e);
+    }
   };
 
   const isDownloaded = (id: string): boolean => {
@@ -447,6 +554,7 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     const updated = { ...settings, ...newSettings };
     setSettings(updated);
     StorageService.saveSettings(updated);
+    showToast('সেটিংস সংরক্ষিত হয়েছে', 'success');
   };
 
   return (
@@ -468,6 +576,8 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
         downloadProgress,
         queue,
         settings,
+        isOnline,
+        toast,
         playAudio,
         togglePlay,
         pause,
@@ -486,9 +596,11 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
         clearAllDownloads,
         isDownloaded,
         setIsFullPlayerOpen,
-        updateSettings
+        updateSettings,
+        showToast,
       }}
     >
+      <Toast toast={toast} onDismiss={() => setToast(null)} />
       {children}
     </AudioPlayerContext.Provider>
   );

@@ -37,6 +37,8 @@ export interface Category {
 export interface DownloadedAudio extends AudioItem {
   downloadedAt: number;    // টাইমস্ট্যাম্প
   blobUrl?: string;        // অফলাইন প্লেব্যাকের জন্য ব্লব ইউআরএল
+  nativePath?: string;     // ডিভাইস ফাইলসিস্টেম পাথ (Android)
+  storageType?: 'native' | 'indexeddb';
   localSize: number;       // বাইটে সাইজ
 }
 

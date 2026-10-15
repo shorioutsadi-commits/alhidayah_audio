@@ -8,7 +8,8 @@ interface SettingsModalProps {
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
-  const { settings, updateSettings, clearAllDownloads } = useAudioPlayer();
+  const { settings, updateSettings, clearAllDownloads, showToast } = useAudioPlayer();
+  const [confirmClear, setConfirmClear] = React.useState(false);
 
   if (!isOpen) return null;
 
@@ -156,18 +157,39 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
           {/* Clear Storage */}
           <div className="pt-2 border-t border-stone-100">
-            <button
-              onClick={() => {
-                if (confirm('আপনি কি অ্যাপের সংরক্ষিত অফলাইন ডাটা পরিষ্কার করতে চান?')) {
-                  clearAllDownloads();
-                  alert('ডাটা পরিষ্কার করা হয়েছে।');
-                }
-              }}
-              className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-stone-100 hover:bg-rose-50 text-stone-600 hover:text-rose-600 rounded-xl text-xs font-bold transition-colors"
-            >
-              <Trash2 className="w-4 h-4" />
-              <span>ক্যাশ ও অফলাইন মেমোরি পরিষ্কার করুন</span>
-            </button>
+            {confirmClear ? (
+              <div className="bg-rose-50 border border-rose-200 rounded-xl p-3 text-center space-y-2">
+                <p className="text-[11px] font-semibold text-rose-800">
+                  আপনি কি সমস্ত অফলাইন ডাটা মুছে ফেলতে চান?
+                </p>
+                <div className="flex gap-2 justify-center">
+                  <button
+                    onClick={() => setConfirmClear(false)}
+                    className="px-3 py-1 bg-white border border-stone-200 text-stone-600 rounded-lg text-xs font-semibold"
+                  >
+                    বাতিল
+                  </button>
+                  <button
+                    onClick={() => {
+                      clearAllDownloads();
+                      setConfirmClear(false);
+                      showToast('ডাটা পরিষ্কার করা হয়েছে', 'success');
+                    }}
+                    className="px-3 py-1 bg-rose-600 text-white rounded-lg text-xs font-bold"
+                  >
+                    হ্যাঁ, মুছুন
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setConfirmClear(true)}
+                className="w-full flex items-center justify-center gap-1.5 py-2.5 bg-stone-100 hover:bg-rose-50 text-stone-600 hover:text-rose-600 rounded-xl text-xs font-bold transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>ক্যাশ ও অফলাইন মেমোরি পরিষ্কার করুন</span>
+              </button>
+            )}
           </div>
 
         </div>

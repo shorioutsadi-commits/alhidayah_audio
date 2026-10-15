@@ -1,0 +1,17 @@
+import type { CapacitorConfig } from '@capacitor/cli';
+
+const config: CapacitorConfig = {
+  appId: 'com.alhidayah.audio',
+  appName: 'আল হিদায়াহ অডিও - Al Hidayah Audio',
+  webDir: 'dist',
+  server: {
+    androidScheme: 'https',
+    cleartext: true,
+  },
+  android: {
+    allowMixedContent: true,
+    backgroundColor: '#1c1917',
+  },
+};
+
+export default config;

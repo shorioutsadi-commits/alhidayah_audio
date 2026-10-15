@@ -32,22 +32,7 @@ const MainAppContent: React.FC = () => {
   const [selectedSpeaker, setSelectedSpeaker] = useState<Speaker | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
 
-  // Online / offline detector
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const { settings, currentAudio } = useAudioPlayer();
-
-  useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
+  const { settings, currentAudio, isOnline } = useAudioPlayer();
 
   const handleSpeakerSelect = (speaker: Speaker | null) => {
     setSelectedSpeaker(speaker);

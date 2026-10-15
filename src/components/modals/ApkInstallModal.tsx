@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Logo } from '../common/Logo';
 import { toBengaliNumber } from '../../utils/bengaliUtils';
+import { useAudioPlayer } from '../../context/AudioPlayerContext';
 
 interface ApkInstallModalProps {
   isOpen: boolean;
@@ -19,8 +20,10 @@ interface ApkInstallModalProps {
 }
 
 export const ApkInstallModal: React.FC<ApkInstallModalProps> = ({ isOpen, onClose }) => {
+  const { showToast } = useAudioPlayer();
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(false);
+  const [showManualGuide, setShowManualGuide] = useState(false);
 
   useEffect(() => {
     const handler = (e: any) => {
@@ -48,15 +51,11 @@ export const ApkInstallModal: React.FC<ApkInstallModalProps> = ({ isOpen, onClos
       if (outcome === 'accepted') {
         setIsInstalled(true);
         setDeferredPrompt(null);
+        showToast('আল হিদায়াহ অ্যাপ সফলভাবে ইনস্টল করা হয়েছে!', 'success');
       }
     } else {
-      // Fallback instructions alert or direct guide
-      alert(
-        'আপনার অ্যান্ড্রয়েড ফোনে অ্যাপটি ইনস্টল করতে:\n' +
-        '১. ব্রাউজারের উপরে ডানপাশের তিন ডট (⋮) অপশনে চাপুন।\n' +
-        '২. "Add to Home screen" বা "Install app" এ ক্লিক করুন।\n' +
-        '৩. সাথে সাথে এটি আপনার মোবাইলের হোম স্ক্রিনে অ্যাপ আকারে যুক্ত হয়ে যাবে!'
-      );
+      setShowManualGuide(true);
+      showToast('নিচের ৩টি ধাপ অনুসরণ করে অ্যাপটি হোমস্ক্রিনে যুক্ত করুন', 'info');
     }
   };
 

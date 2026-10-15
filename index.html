@@ -16,6 +16,16 @@
     <link rel="icon" type="image/svg+xml" href="./icon.svg" />
     <link rel="apple-touch-icon" href="./icon.svg" />
     <link rel="manifest" href="./manifest.json" />
+    <script>
+      // Self-heal subpath URL without trailing slash on GitHub Pages so relative assets load properly
+      (function() {
+        if (window.location.hostname.includes('github.io') && window.location.pathname.replace(/\/$/, '').endsWith('/alhidayah_audio')) {
+          if (!window.location.pathname.endsWith('/')) {
+            window.location.replace(window.location.pathname + '/' + window.location.search + window.location.hash);
+          }
+        }
+      })();
+    </script>
   </head>
   <body class="bg-stone-50 text-stone-900 antialiased selection:bg-orange-500 selection:text-white select-none">
     <div id="root"></div>
