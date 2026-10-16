@@ -59,10 +59,17 @@ const MainAppContent: React.FC = () => {
   const lastBackActionTimeRef = useRef<number>(0);
   const lastExitPromptTimeRef = useRef<number>(0);
 
-  // Status bar styling on Android Native
+  // Status bar styling & safe area measurement on Android Native
   useEffect(() => {
     if (Capacitor.isNativePlatform()) {
       StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
+      StatusBar.getInfo()
+        .then((info) => {
+          if (info && info.height) {
+            document.documentElement.style.setProperty('--safe-area-top', `${info.height}px`);
+          }
+        })
+        .catch(() => {});
     }
   }, []);
 
@@ -262,7 +269,7 @@ const MainAppContent: React.FC = () => {
 
       {/* Offline Alert Strip */}
       {!isOnline && (
-        <div className="bg-amber-600 text-white text-[11px] font-semibold py-1 px-4 text-center flex items-center justify-center gap-1.5 shadow-xs sticky top-[57px] z-20">
+        <div className="bg-amber-600 text-white text-[11px] font-semibold py-1 px-4 text-center flex items-center justify-center gap-1.5 shadow-xs z-20">
           <WifiOff className="w-3.5 h-3.5" />
           <span>ইন্টারনেট সংযোগ বিচ্ছিন্ন রয়েছে — অফলাইনে সংরক্ষিত অডিওসমূহ শুনুন</span>
         </div>

@@ -20,7 +20,7 @@ export const MiniPlayer: React.FC = () => {
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="fixed bottom-[calc(53px+env(safe-area-inset-bottom,0px))] left-0 right-0 z-35 px-2 pointer-events-auto">
+    <div className="fixed mini-player-pos left-0 right-0 z-35 px-2 pointer-events-auto">
       <div 
         onClick={() => setIsFullPlayerOpen(true)}
         className="max-w-md mx-auto relative bg-stone-900/95 text-white backdrop-blur-md rounded-2xl shadow-xl border border-stone-800/80 overflow-hidden cursor-pointer select-none group transition-all transform active:scale-[0.99]"

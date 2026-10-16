@@ -11,12 +11,25 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Ensure the WebView layout container reliably starts below the status bar and camera cutout
+        // Keep the WebView 100% full-screen edge-to-edge without shrinking or padding the container.
+        // Measure system insets and pass them directly to the WebView as CSS custom properties.
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (view, windowInsets) -> {
             Insets insets = windowInsets.getInsets(
                 WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout()
             );
-            view.setPadding(insets.left, insets.top, insets.right, insets.bottom);
+            float density = getResources().getDisplayMetrics().density;
+            float topDp = insets.top / density;
+            float bottomDp = insets.bottom / density;
+
+            if (getBridge() != null && getBridge().getWebView() != null) {
+                getBridge().getWebView().post(() -> {
+                    getBridge().getWebView().evaluateJavascript(
+                        "document.documentElement.style.setProperty('--safe-area-top', '" + topDp + "px');" +
+                        "document.documentElement.style.setProperty('--safe-area-bottom', '" + bottomDp + "px');",
+                        null
+                    );
+                });
+            }
             return windowInsets;
         });
     }
