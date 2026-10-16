@@ -89,7 +89,7 @@ export const FullPlayerModal: React.FC = () => {
     <div className="fixed inset-0 z-50 bg-stone-950/90 backdrop-blur-xl flex flex-col justify-between overflow-y-auto animate-in slide-in-from-bottom duration-300">
       
       {/* Top Bar */}
-      <div className="max-w-md mx-auto w-full px-5 pt-4 pb-2 flex items-center justify-between text-white">
+      <div className="max-w-md mx-auto w-full px-5 pt-[calc(1rem+env(safe-area-inset-top,0px))] pb-2 flex items-center justify-between text-white">
         <button
           onClick={() => setIsFullPlayerOpen(false)}
           className="p-2 -ml-2 rounded-full hover:bg-white/10 active:scale-95 text-stone-300 hover:text-white transition-all"
@@ -321,7 +321,7 @@ export const FullPlayerModal: React.FC = () => {
       </div>
 
       {/* Bottom Auxiliary Controls (Speed, Sleep Timer, Quality) */}
-      <div className="max-w-md mx-auto w-full px-6 py-4 border-t border-stone-800/80 bg-stone-900/60 backdrop-blur-md">
+      <div className="max-w-md mx-auto w-full px-6 py-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] border-t border-stone-800/80 bg-stone-900/60 backdrop-blur-md">
         <div className="flex items-center justify-between text-xs text-stone-400">
           
           {/* Playback Speed Button & Dropdown */}

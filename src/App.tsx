@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AudioPlayerProvider, useAudioPlayer } from './context/AudioPlayerContext';
 import { Header } from './components/common/Header';
 import { BottomNav, TabType } from './components/common/BottomNav';
@@ -17,6 +17,15 @@ import { ApkInstallModal } from './components/modals/ApkInstallModal';
 import { SleepTimerModal } from './components/modals/SleepTimerModal';
 import { Speaker } from './types/audio';
 import { WifiOff, Car } from 'lucide-react';
+import { App as CapApp } from '@capacitor/app';
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { Capacitor } from '@capacitor/core';
+
+interface NavHistoryEntry {
+  tab: TabType;
+  speaker: Speaker | null;
+  categoryId: string | null;
+}
 
 const MainAppContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('home');
@@ -32,11 +41,185 @@ const MainAppContent: React.FC = () => {
   const [selectedSpeaker, setSelectedSpeaker] = useState<Speaker | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
 
-  const { settings, currentAudio, isOnline } = useAudioPlayer();
+  const { 
+    settings, 
+    currentAudio, 
+    isOnline, 
+    isFullPlayerOpen, 
+    setIsFullPlayerOpen, 
+    showToast 
+  } = useAudioPlayer();
+
+  // Navigation history stack to track backward transitions
+  const navHistoryRef = useRef<NavHistoryEntry[]>([
+    { tab: 'home', speaker: null, categoryId: null }
+  ]);
+
+  // Debouncing refs to prevent double-firing from both Capacitor backButton and browser popstate
+  const lastBackActionTimeRef = useRef<number>(0);
+  const lastExitPromptTimeRef = useRef<number>(0);
+
+  // Status bar styling on Android Native
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
+    }
+  }, []);
+
+  // Back button state reference to avoid stale closures
+  const stateRef = useRef({
+    isFullPlayerOpen,
+    isDrawerOpen,
+    isSearchOpen,
+    isSettingsOpen,
+    isAboutOpen,
+    isInstallOpen,
+    isSleepTimerOpen,
+    selectedSpeaker,
+    selectedCategoryId,
+    activeTab,
+  });
+
+  useEffect(() => {
+    stateRef.current = {
+      isFullPlayerOpen,
+      isDrawerOpen,
+      isSearchOpen,
+      isSettingsOpen,
+      isAboutOpen,
+      isInstallOpen,
+      isSleepTimerOpen,
+      selectedSpeaker,
+      selectedCategoryId,
+      activeTab,
+    };
+  });
+
+  // Comprehensive, debounced Android Hardware / Gesture Back Button handling
+  useEffect(() => {
+    const handleBackButton = () => {
+      const now = Date.now();
+      // Debounce rapid duplicate events (within 300ms)
+      if (now - lastBackActionTimeRef.current < 300) {
+        return;
+      }
+      lastBackActionTimeRef.current = now;
+
+      const s = stateRef.current;
+
+      // 1. If full screen player is open, close it first
+      if (s.isFullPlayerOpen) {
+        setIsFullPlayerOpen(false);
+        return;
+      }
+
+      // 2. If navigation drawer is open, close it
+      if (s.isDrawerOpen) {
+        setIsDrawerOpen(false);
+        return;
+      }
+
+      // 3. If any modal dialog is open, close it
+      if (s.isSearchOpen) {
+        setIsSearchOpen(false);
+        return;
+      }
+      if (s.isSettingsOpen) {
+        setIsSettingsOpen(false);
+        return;
+      }
+      if (s.isAboutOpen) {
+        setIsAboutOpen(false);
+        return;
+      }
+      if (s.isInstallOpen) {
+        setIsInstallOpen(false);
+        return;
+      }
+      if (s.isSleepTimerOpen) {
+        setIsSleepTimerOpen(false);
+        return;
+      }
+
+      // 4. Submenu: If viewing a speaker's audio list, return to previous view
+      if (s.selectedSpeaker !== null) {
+        setSelectedSpeaker(null);
+        if (navHistoryRef.current.length > 1) {
+          navHistoryRef.current.pop();
+          const prev = navHistoryRef.current[navHistoryRef.current.length - 1];
+          setActiveTab(prev.tab);
+        }
+        return;
+      }
+
+      // 5. Submenu: If viewing a category's audio list, return to previous view
+      if (s.selectedCategoryId !== null) {
+        setSelectedCategoryId(null);
+        if (navHistoryRef.current.length > 1) {
+          navHistoryRef.current.pop();
+          const prev = navHistoryRef.current[navHistoryRef.current.length - 1];
+          setActiveTab(prev.tab);
+        }
+        return;
+      }
+
+      // 6. Navigation Stack: Return to previous tab if history exists
+      if (navHistoryRef.current.length > 1) {
+        navHistoryRef.current.pop();
+        const prev = navHistoryRef.current[navHistoryRef.current.length - 1];
+        setActiveTab(prev.tab);
+        setSelectedSpeaker(prev.speaker);
+        setSelectedCategoryId(prev.categoryId);
+        return;
+      }
+
+      // 7. If on a secondary tab other than home, return to home
+      if (s.activeTab !== 'home') {
+        setActiveTab('home');
+        navHistoryRef.current = [{ tab: 'home', speaker: null, categoryId: null }];
+        return;
+      }
+
+      // 8. On home screen with no overlays: Double-tap to exit application
+      if (now - lastExitPromptTimeRef.current < 2000) {
+        CapApp.exitApp();
+      } else {
+        lastExitPromptTimeRef.current = now;
+        showToast('অ্যাপ থেকে বের হতে পুনরায় ব্যাক বাটন চাপুন', 'info');
+      }
+    };
+
+    const listenerPromise = CapApp.addListener('backButton', handleBackButton);
+
+    // Also handle document backbutton event (standard Cordova/Capacitor DOM event)
+    const handleDocumentBack = (e: Event) => {
+      e.preventDefault();
+      handleBackButton();
+    };
+    document.addEventListener('backbutton', handleDocumentBack);
+
+    // Also support browser back navigation
+    const handlePopState = (e: PopStateEvent) => {
+      e.preventDefault();
+      handleBackButton();
+    };
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      listenerPromise.then(handle => handle.remove()).catch(() => {});
+      document.removeEventListener('backbutton', handleDocumentBack);
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [setIsFullPlayerOpen, showToast]);
 
   const handleSpeakerSelect = (speaker: Speaker | null) => {
     setSelectedSpeaker(speaker);
     if (speaker) {
+      navHistoryRef.current.push({
+        tab: 'speakers',
+        speaker,
+        categoryId: null,
+      });
       setActiveTab('speakers');
     }
   };
@@ -44,7 +227,25 @@ const MainAppContent: React.FC = () => {
   const handleCategorySelect = (categoryId: string | null) => {
     setSelectedCategoryId(categoryId);
     if (categoryId) {
+      navHistoryRef.current.push({
+        tab: 'categories',
+        speaker: null,
+        categoryId,
+      });
       setActiveTab('categories');
+    }
+  };
+
+  const handleTabChange = (newTab: TabType) => {
+    if (newTab !== activeTab) {
+      navHistoryRef.current.push({
+        tab: newTab,
+        speaker: null,
+        categoryId: null,
+      });
+      setActiveTab(newTab);
+      setSelectedSpeaker(null);
+      setSelectedCategoryId(null);
     }
   };
 
@@ -56,7 +257,7 @@ const MainAppContent: React.FC = () => {
         onOpenDrawer={() => setIsDrawerOpen(true)}
         onOpenSearch={() => setIsSearchOpen(true)}
         onOpenInstallModal={() => setIsInstallOpen(true)}
-        onOpenDownloadsTab={() => setActiveTab('downloads')}
+        onOpenDownloadsTab={() => handleTabChange('downloads')}
       />
 
       {/* Offline Alert Strip */}
@@ -76,12 +277,12 @@ const MainAppContent: React.FC = () => {
       )}
 
       {/* Main View Container */}
-      <main className="flex-1 w-full max-w-md mx-auto">
+      <main className="flex-1 w-full max-w-md mx-auto pb-32">
         {activeTab === 'home' && (
           <HomeScreen
             onSelectSpeaker={handleSpeakerSelect}
             onSelectCategory={handleCategorySelect}
-            onNavigateTab={setActiveTab}
+            onNavigateTab={handleTabChange}
           />
         )}
 
@@ -100,27 +301,21 @@ const MainAppContent: React.FC = () => {
         )}
 
         {activeTab === 'downloads' && (
-          <DownloadsScreen onNavigateTab={setActiveTab} />
+          <DownloadsScreen onNavigateTab={handleTabChange} />
         )}
 
         {activeTab === 'favorites' && (
-          <FavoritesScreen onNavigateTab={setActiveTab} />
+          <FavoritesScreen onNavigateTab={handleTabChange} />
         )}
       </main>
 
-      {/* Fixed Mini Player Bar (image_3.png style) */}
+      {/* Fixed Mini Player Bar */}
       <MiniPlayer />
 
       {/* Fixed Bottom Navigation Bar */}
       <BottomNav
         activeTab={activeTab}
-        onTabChange={(tab) => {
-          setActiveTab(tab);
-          // If switching to directory tab directly, reset specific selection if desired
-          if (tab === 'speakers' && selectedSpeaker) {
-            // Keep or reset
-          }
-        }}
+        onTabChange={handleTabChange}
       />
 
       {/* Full-Screen Music Player Modal */}
@@ -130,7 +325,7 @@ const MainAppContent: React.FC = () => {
       <SideDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
-        onSelectTab={setActiveTab}
+        onSelectTab={handleTabChange}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenAbout={() => {
           setAboutInitialTab('about');

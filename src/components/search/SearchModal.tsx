@@ -57,7 +57,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
     <div className="fixed inset-0 z-50 bg-stone-50 flex flex-col animate-in fade-in duration-200">
       
       {/* Search Header Bar */}
-      <div className="bg-white border-b border-stone-200 px-4 py-3 sticky top-0 z-10 shadow-xs">
+      <div className="bg-white border-b border-stone-200 px-4 py-3 pt-[calc(0.75rem+env(safe-area-inset-top,0px))] sticky top-0 z-10 shadow-xs">
         <div className="max-w-md mx-auto flex items-center gap-2">
           <button
             onClick={onClose}

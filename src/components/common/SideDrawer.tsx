@@ -79,11 +79,11 @@ export const SideDrawer: React.FC<SideDrawerProps> = ({
       <div className="relative w-4/5 max-w-xs h-full bg-white shadow-2xl flex flex-col z-10 animate-in slide-in-from-left duration-250">
         
         {/* Drawer Header */}
-        <div className="bg-gradient-to-br from-orange-600 via-orange-500 to-amber-600 p-5 text-white relative">
+        <div className="bg-gradient-to-br from-orange-600 via-orange-500 to-amber-600 p-5 pt-[calc(1.25rem+env(safe-area-inset-top,0px))] text-white relative">
           <button 
             onClick={onClose}
             aria-label="মেনু বন্ধ করুন"
-            className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-white/20 active:scale-95 text-white/90 hover:text-white transition-all"
+            className="absolute top-[calc(1rem+env(safe-area-inset-top,0px))] right-4 p-1.5 rounded-full hover:bg-white/20 active:scale-95 text-white/90 hover:text-white transition-all"
           >
             <X className="w-5 h-5" />
           </button>

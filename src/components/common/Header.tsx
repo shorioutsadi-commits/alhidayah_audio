@@ -20,7 +20,7 @@ export const Header: React.FC<HeaderProps> = ({
   const { downloads } = useAudioPlayer();
 
   return (
-    <header className="sticky top-0 z-30 bg-gradient-to-r from-orange-600 via-orange-500 to-amber-600 text-white shadow-md shadow-orange-950/10 transition-all">
+    <header className="sticky top-0 z-30 bg-gradient-to-r from-orange-600 via-orange-500 to-amber-600 text-white shadow-md shadow-orange-950/10 transition-all safe-area-top">
       <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
         
         {/* Left: Drawer Menu Hamburger & Brand */}
