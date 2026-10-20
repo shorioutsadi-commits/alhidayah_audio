@@ -82,8 +82,34 @@ export const StorageService = {
     return updated;
   },
 
+  saveFavorites(favorites: string[]): void {
+    inMemoryFavorites = favorites;
+    try {
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+    } catch (e) {
+      console.warn('Could not save favorites to localStorage', e);
+    }
+  },
+
   isFavorite(id: string): boolean {
     return this.getFavorites().includes(id);
+  },
+
+  savePlaybackPosition(audioId: string, position: number): void {
+    try {
+      localStorage.setItem(`playback_pos_${audioId}`, String(position));
+    } catch {
+      // ignore
+    }
+  },
+
+  getPlaybackPosition(audioId: string): number {
+    try {
+      const val = localStorage.getItem(`playback_pos_${audioId}`);
+      return val ? parseFloat(val) : 0;
+    } catch {
+      return 0;
+    }
   },
 
   // Downloads Metadata

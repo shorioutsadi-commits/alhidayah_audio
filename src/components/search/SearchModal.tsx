@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, X, ArrowLeft, Tag, Sparkles } from 'lucide-react';
-import { AUDIOS_DATA } from '../../data/mockAudioData';
 import { AudioCard } from '../home/AudioCard';
 import { toBengaliNumber } from '../../utils/bengaliUtils';
+import { useAudioPlayer } from '../../context/AudioPlayerContext';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -12,6 +12,7 @@ interface SearchModalProps {
 export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const { audios } = useAudioPlayer();
 
   useEffect(() => {
     if (isOpen) {
@@ -42,7 +43,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
 
   const results = query.trim() === '' 
     ? [] 
-    : AUDIOS_DATA.filter((item) => {
+    : audios.filter((item) => {
         const q = query.toLowerCase().trim();
         return (
           item.title.toLowerCase().includes(q) ||

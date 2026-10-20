@@ -1,6 +1,7 @@
 import React from 'react';
-import { X, Settings, Volume2, Car, Bell, Wifi, Trash2, CheckCircle2 } from 'lucide-react';
+import { X, Settings, Volume2, Car, Bell, Wifi, Trash2, CheckCircle2, RefreshCw, Music } from 'lucide-react';
 import { useAudioPlayer } from '../../context/AudioPlayerContext';
+import { toBengaliNumber } from '../../utils/bengaliUtils';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -8,7 +9,15 @@ interface SettingsModalProps {
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
-  const { settings, updateSettings, clearAllDownloads, showToast } = useAudioPlayer();
+  const { 
+    settings, 
+    updateSettings, 
+    clearAllDownloads, 
+    showToast,
+    catalog,
+    isCatalogLoading,
+    refreshCatalog
+  } = useAudioPlayer();
   const [confirmClear, setConfirmClear] = React.useState(false);
 
   if (!isOpen) return null;
@@ -153,6 +162,38 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               onChange={(e) => updateSettings({ downloadOverWifiOnly: e.target.checked })}
               className="w-4 h-4 accent-orange-600 rounded cursor-pointer"
             />
+          </div>
+
+          {/* Audio Library Sync / Refresh */}
+          <div className="pt-3 border-t border-stone-100">
+            <div className="bg-orange-50/70 border border-orange-150 rounded-2xl p-3.5 space-y-2.5">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 bg-orange-100 text-orange-600 rounded-lg">
+                    <Music className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-stone-800">অডিও লাইব্রেরি ক্যাটালগ</h4>
+                    <p className="text-[10px] text-stone-500">
+                      মোট {toBengaliNumber(catalog.totalAudios)}টি অডিও • সংস্করণ {toBengaliNumber(catalog.version)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-[11px] text-stone-600 leading-relaxed">
+                নতুন ওয়াজ বা তিলাওয়াত যোগ হলে অ্যাপ স্বয়ংক্রিয়ভাবে আপডেট নেয়। আপনি চাইলে এখনি রিমোট সার্ভার থেকে নতুন অডিও চেক করতে পারেন।
+              </p>
+
+              <button
+                onClick={() => refreshCatalog(true)}
+                disabled={isCatalogLoading}
+                className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-orange-600 hover:bg-orange-500 disabled:bg-orange-300 text-white rounded-xl text-xs font-bold shadow-xs active:scale-95 transition-all cursor-pointer"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isCatalogLoading ? 'animate-spin' : ''}`} />
+                <span>{isCatalogLoading ? 'আপডেট খোঁজা হচ্ছে...' : 'নতুন অডিওর আপডেট পরীক্ষা করুন'}</span>
+              </button>
+            </div>
           </div>
 
           {/* Clear Storage */}

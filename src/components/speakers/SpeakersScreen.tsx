@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { ArrowLeft, Mic2, Search, Play, X, Filter } from 'lucide-react';
-import { SPEAKERS_DATA, AUDIOS_DATA } from '../../data/mockAudioData';
 import { Speaker, AudioItem } from '../../types/audio';
 import { AudioCard } from '../home/AudioCard';
 import { toBengaliNumber } from '../../utils/bengaliUtils';
@@ -17,20 +16,20 @@ export const SpeakersScreen: React.FC<SpeakersScreenProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('সকল');
-  const { playAudio } = useAudioPlayer();
+  const { playAudio, speakers, audios } = useAudioPlayer();
 
-  // Extract unique categories from speakers
+  // Extract unique categories from dynamic speakers
   const categoriesList = useMemo(() => {
     const set = new Set<string>();
-    SPEAKERS_DATA.forEach(s => {
+    speakers.forEach(s => {
       if (s.category) set.add(s.category);
     });
     return ['সকল', ...Array.from(set).slice(0, 7)];
-  }, []);
+  }, [speakers]);
 
   // Filtered speakers
   const filteredSpeakers = useMemo(() => {
-    return SPEAKERS_DATA.filter(s => {
+    return speakers.filter(s => {
       const matchesSearch = 
         s.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
         s.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -42,11 +41,11 @@ export const SpeakersScreen: React.FC<SpeakersScreenProps> = ({
 
       return matchesSearch && matchesCategory;
     });
-  }, [searchTerm, selectedCategoryFilter]);
+  }, [speakers, searchTerm, selectedCategoryFilter]);
 
   // If a speaker is selected, show their full detail view
   if (selectedSpeaker) {
-    const explicitAudios = AUDIOS_DATA.filter(
+    const explicitAudios = audios.filter(
       a => a.speakerId === selectedSpeaker.id || a.speakerName.includes(selectedSpeaker.name)
     );
 
@@ -191,7 +190,7 @@ export const SpeakersScreen: React.FC<SpeakersScreenProps> = ({
             <h2 className="text-base font-bold text-stone-900">বক্তাগণ ও দাঈগণ</h2>
           </div>
           <span className="text-xs font-semibold text-stone-500">
-            {toBengaliNumber(SPEAKERS_DATA.length)} জন স্কলার
+            {toBengaliNumber(speakers.length)} জন স্কলার
           </span>
         </div>
 

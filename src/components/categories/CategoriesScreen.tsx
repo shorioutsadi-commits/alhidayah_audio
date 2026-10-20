@@ -13,7 +13,6 @@ import {
   HelpCircle,
   FolderOpen
 } from 'lucide-react';
-import { CATEGORIES_DATA, AUDIOS_DATA } from '../../data/mockAudioData';
 import { Category, AudioItem } from '../../types/audio';
 import { AudioCard } from '../home/AudioCard';
 import { toBengaliNumber } from '../../utils/bengaliUtils';
@@ -42,13 +41,13 @@ export const CategoriesScreen: React.FC<CategoriesScreenProps> = ({
   selectedCategoryId,
   onSelectCategory
 }) => {
-  const { playAudio } = useAudioPlayer();
+  const { playAudio, categories, audios } = useAudioPlayer();
 
-  const selectedCategory = CATEGORIES_DATA.find(c => c.id === selectedCategoryId);
+  const selectedCategory = categories.find(c => c.id === selectedCategoryId);
 
   // If a category is selected, show filtered audios
   if (selectedCategory) {
-    const categoryAudios = AUDIOS_DATA.filter(a => a.category === selectedCategory.name);
+    const categoryAudios = audios.filter(a => a.category.trim() === selectedCategory.name.trim());
     const Icon = getCategoryIcon(selectedCategory.iconName);
 
     return (
@@ -120,12 +119,12 @@ export const CategoriesScreen: React.FC<CategoriesScreenProps> = ({
           <h2 className="text-base font-bold text-stone-900">বিষয়ভিত্তিক ক্যাটাগরি</h2>
         </div>
         <span className="text-xs font-semibold text-stone-400">
-          {toBengaliNumber(CATEGORIES_DATA.length)} টি বিভাগ
+          {toBengaliNumber(categories.length)} টি বিভাগ
         </span>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        {CATEGORIES_DATA.map((cat) => {
+        {categories.map((cat) => {
           const Icon = getCategoryIcon(cat.iconName);
 
           return (

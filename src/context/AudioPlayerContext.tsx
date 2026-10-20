@@ -1,11 +1,22 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
-import { AudioItem, DownloadedAudio, PlayMode, PlayerSettings } from '../types/audio';
+import { AudioItem, DownloadedAudio, PlayMode, PlayerSettings, Speaker, Category } from '../types/audio';
 import { StorageService } from '../services/storageService';
-import { AUDIOS_DATA } from '../data/mockAudioData';
+import { CatalogService, AudioCatalog } from '../services/catalogService';
 import { Network } from '@capacitor/network';
+import { App as CapApp } from '@capacitor/app';
 import { ToastMessage, Toast } from '../components/common/Toast';
 
 interface AudioPlayerContextType {
+  // Catalog Data
+  catalog: AudioCatalog;
+  audios: AudioItem[];
+  speakers: Speaker[];
+  categories: Category[];
+  isCatalogLoading: boolean;
+  catalogLastUpdated: string | null;
+  refreshCatalog: (showToastNotification?: boolean) => Promise<void>;
+
+  // Playback state
   currentAudio: AudioItem | null;
   isPlaying: boolean;
   isLoading: boolean;
@@ -51,6 +62,10 @@ interface AudioPlayerContextType {
 const AudioPlayerContext = createContext<AudioPlayerContextType | undefined>(undefined);
 
 export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Initialize dynamic catalog synchronously from cached local storage / fallback
+  const [catalog, setCatalog] = useState<AudioCatalog>(() => CatalogService.getCachedCatalog());
+  const [isCatalogLoading, setIsCatalogLoading] = useState<boolean>(false);
+
   const [currentAudio, setCurrentAudio] = useState<AudioItem | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -69,7 +84,7 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [favorites, setFavorites] = useState<string[]>([]);
   const [downloads, setDownloads] = useState<DownloadedAudio[]>([]);
   const [downloadProgress, setDownloadProgress] = useState<{ [id: string]: number }>({});
-  const [queue, setQueue] = useState<AudioItem[]>(AUDIOS_DATA);
+  const [queue, setQueue] = useState<AudioItem[]>(() => CatalogService.getCachedCatalog().audios);
   const [settings, setSettings] = useState<PlayerSettings>(() => StorageService.getSettings());
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -84,6 +99,71 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       setToast(null);
     }, 3800);
   }, []);
+
+  // Centralized catalog refresh method
+  const refreshCatalog = useCallback(async (showToastNotification: boolean = false) => {
+    setIsCatalogLoading(true);
+    if (showToastNotification) {
+      showToast('অডিও তালিকা আপডেট পরীক্ষা করা হচ্ছে...', 'info');
+    }
+
+    try {
+      const result = await CatalogService.fetchRemoteCatalog();
+      setCatalog(result.catalog);
+      
+      // Update queue with latest audios while preserving current track
+      setQueue((prevQueue) => {
+        if (prevQueue.length === 0) return result.catalog.audios;
+        return result.catalog.audios;
+      });
+
+      if (showToastNotification) {
+        if (result.isNew) {
+          showToast(`নতুন অডিও যুক্ত হয়েছে! মোট ${result.catalog.totalAudios}টি অডিও সংগৃহীত`, 'success');
+        } else if (result.fromRemote) {
+          showToast('অডিও ক্যাটালগ ইতিমধ্যে সর্বশেষ ভার্সনে রয়েছে', 'info');
+        } else {
+          showToast('ইন্টারনেট সংযোগ না থাকায় সংরক্ষিত ক্যাটালগ প্রদর্শিত হচ্ছে', 'warning');
+        }
+      }
+    } catch (err) {
+      console.warn('Error during catalog refresh:', err);
+      if (showToastNotification) {
+        showToast('ক্যাটালগ আপডেট করা যায়নি — ইন্টারনেট পরীক্ষা করুন', 'error');
+      }
+    } finally {
+      setIsCatalogLoading(false);
+    }
+  }, [showToast]);
+
+  // Initial remote fetch on app mount + refresh on resume & network online
+  useEffect(() => {
+    // 1. Fetch latest catalog silently on mount
+    refreshCatalog(false);
+
+    // 2. Refresh catalog when app resumes from background on native device
+    let resumeHandlePromise: Promise<any> | null = null;
+    try {
+      resumeHandlePromise = CapApp.addListener('resume', () => {
+        refreshCatalog(false);
+      });
+    } catch {
+      // not native
+    }
+
+    // 3. Refresh catalog when device reconnects to internet
+    const handleOnline = () => {
+      refreshCatalog(false);
+    };
+    window.addEventListener('online', handleOnline);
+
+    return () => {
+      if (resumeHandlePromise) {
+        resumeHandlePromise.then(h => h.remove()).catch(() => {});
+      }
+      window.removeEventListener('online', handleOnline);
+    };
+  }, [refreshCatalog]);
 
   // Monitor network status with Capacitor Network + browser events
   useEffect(() => {
@@ -140,138 +220,87 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     audio.preload = 'metadata';
     audioRef.current = audio;
 
-    const onTimeUpdate = () => {
-      setCurrentTime(audio.currentTime);
-    };
-
-    const onLoadedMetadata = () => {
+    const handleLoadedMetadata = () => {
       setDuration(audio.duration || 0);
       setIsLoading(false);
     };
 
-    const onWaiting = () => setIsLoading(true);
-    const onPlaying = () => {
-      setIsLoading(false);
-      setIsPlaying(true);
-    };
-    const onPause = () => setIsPlaying(false);
-
-    const onEnded = () => {
-      handleTrackEnded();
-    };
-
-    const onError = (e: Event) => {
-      console.warn('Audio element error event:', e);
-      setIsLoading(false);
-      // If error occurs with archive.org download URL, try direct CDN node mirror
-      if (audio.src && audio.src.includes('archive.org/download/')) {
-        const directMirror = audio.src.replace('https://archive.org/download/', 'https://dn710002.ca.archive.org/0/items/');
-        console.log('Switching to archive.org direct CDN mirror:', directMirror);
-        audio.src = directMirror;
-        audio.play().then(() => setIsPlaying(true)).catch((err) => {
-          console.warn('Mirror playback failed:', err);
-          setIsPlaying(false);
-          showToast('অডিও লোড করা যায়নি — ইন্টারনেট সংযোগ পরীক্ষা করুন', 'error');
-        });
-      } else {
-        setIsPlaying(false);
-        if (!navigator.onLine) {
-          showToast('ইন্টারনেট নেই — অডিওটি শুনতে ডাউনলোড করুন', 'warning');
-        } else {
-          showToast('অডিও প্লেব্যাকের সময় একটি সমস্যা হয়েছে', 'error');
-        }
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+      // Save playback progress
+      if (currentAudio) {
+        StorageService.savePlaybackPosition(currentAudio.id, audio.currentTime);
       }
     };
 
-    audio.addEventListener('timeupdate', onTimeUpdate);
-    audio.addEventListener('loadedmetadata', onLoadedMetadata);
-    audio.addEventListener('waiting', onWaiting);
-    audio.addEventListener('playing', onPlaying);
-    audio.addEventListener('pause', onPause);
-    audio.addEventListener('ended', onEnded);
-    audio.addEventListener('error', onError);
+    const handleEnded = () => {
+      setIsPlaying(false);
+      handleTrackEnd();
+    };
+
+    const handleWaiting = () => {
+      setIsLoading(true);
+    };
+
+    const handleCanPlay = () => {
+      setIsLoading(false);
+    };
+
+    const handleError = (e: Event) => {
+      console.warn('Audio playback error event:', e);
+      setIsLoading(false);
+      setIsPlaying(false);
+    };
+
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('waiting', handleWaiting);
+    audio.addEventListener('canplay', handleCanPlay);
+    audio.addEventListener('error', handleError);
 
     return () => {
-      audio.removeEventListener('timeupdate', onTimeUpdate);
-      audio.removeEventListener('loadedmetadata', onLoadedMetadata);
-      audio.removeEventListener('waiting', onWaiting);
-      audio.removeEventListener('playing', onPlaying);
-      audio.removeEventListener('pause', onPause);
-      audio.removeEventListener('ended', onEnded);
-      audio.removeEventListener('error', onError);
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('waiting', handleWaiting);
+      audio.removeEventListener('canplay', handleCanPlay);
+      audio.removeEventListener('error', handleError);
       audio.pause();
+      audio.src = '';
     };
-  }, [showToast]);
+  }, []);
 
-  // Update MediaSession on track change
+  // Sleep Timer Handler
   useEffect(() => {
-    if (!currentAudio) return;
-
-    if ('mediaSession' in navigator) {
-      try {
-        navigator.mediaSession.metadata = new MediaMetadata({
-          title: currentAudio.title,
-          artist: currentAudio.speakerName,
-          album: 'আল হিদায়াহ অডিও (Al Hidayah)',
-          artwork: [
-            { src: currentAudio.speakerImage, sizes: '512x512', type: 'image/jpeg' }
-          ]
-        });
-
-        navigator.mediaSession.setActionHandler('play', () => resume());
-        navigator.mediaSession.setActionHandler('pause', () => pause());
-        navigator.mediaSession.setActionHandler('previoustrack', () => prevTrack());
-        navigator.mediaSession.setActionHandler('nexttrack', () => nextTrack());
-        navigator.mediaSession.setActionHandler('seekbackward', () => skipSeconds(-10));
-        navigator.mediaSession.setActionHandler('seekforward', () => skipSeconds(10));
-      } catch (e) {
-        console.warn('MediaSession setup note:', e);
-      }
+    if (sleepTimerIntervalRef.current) {
+      clearInterval(sleepTimerIntervalRef.current);
+      sleepTimerIntervalRef.current = null;
     }
-  }, [currentAudio]);
 
-  const handleTrackEnded = () => {
-    if (playMode === 'repeat-one') {
-      if (audioRef.current) {
-        audioRef.current.currentTime = 0;
-        audioRef.current.play().catch(console.warn);
-      }
-    } else {
-      nextTrack();
-    }
-  };
-
-  // Sleep Timer countdown
-  useEffect(() => {
     if (sleepTimerMinutes === null) {
-      if (sleepTimerIntervalRef.current) {
-        clearInterval(sleepTimerIntervalRef.current);
-        sleepTimerIntervalRef.current = null;
-      }
       setSleepTimerRemaining(null);
       return;
     }
 
-    const totalSeconds = sleepTimerMinutes * 60;
-    setSleepTimerRemaining(totalSeconds);
-
-    if (sleepTimerIntervalRef.current) {
-      clearInterval(sleepTimerIntervalRef.current);
-    }
+    let remainingSeconds = sleepTimerMinutes * 60;
+    setSleepTimerRemaining(remainingSeconds);
+    showToast(`ঘুমের টাইমার: ${sleepTimerMinutes} মিনিট পর অডিও বন্ধ হবে`, 'info');
 
     sleepTimerIntervalRef.current = setInterval(() => {
-      setSleepTimerRemaining((prev) => {
-        if (prev === null || prev <= 1) {
-          if (sleepTimerIntervalRef.current) {
-            clearInterval(sleepTimerIntervalRef.current);
-          }
-          pause();
-          setSleepTimerMinutes(null);
-          showToast('স্লিপ টাইমার শেষ — অডিও বিরতি দেওয়া হয়েছে', 'info');
-          return null;
+      remainingSeconds -= 1;
+      setSleepTimerRemaining(remainingSeconds);
+
+      if (remainingSeconds <= 0) {
+        if (sleepTimerIntervalRef.current) {
+          clearInterval(sleepTimerIntervalRef.current);
+          sleepTimerIntervalRef.current = null;
         }
-        return prev - 1;
-      });
+        pause();
+        setSleepTimerMinutes(null);
+        setSleepTimerRemaining(null);
+        showToast('ঘুমের টাইমার সমাপ্ত — অডিও বন্ধ করা হয়েছে', 'info');
+      }
     }, 1000);
 
     return () => {
@@ -279,23 +308,65 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
         clearInterval(sleepTimerIntervalRef.current);
       }
     };
-  }, [sleepTimerMinutes, showToast]);
+  }, [sleepTimerMinutes]);
+
+  // Media Session Controls (Lock screen / Notification bar)
+  useEffect(() => {
+    if ('mediaSession' in navigator && currentAudio) {
+      try {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: currentAudio.title,
+          artist: currentAudio.speakerName,
+          album: 'আল হিদায়াহ অডিও লাইব্রেরি',
+          artwork: [
+            { src: currentAudio.speakerImage, sizes: '96x96', type: 'image/jpeg' },
+            { src: currentAudio.speakerImage, sizes: '128x128', type: 'image/jpeg' },
+            { src: currentAudio.speakerImage, sizes: '192x192', type: 'image/jpeg' },
+            { src: currentAudio.speakerImage, sizes: '512x512', type: 'image/jpeg' },
+          ]
+        });
+
+        navigator.mediaSession.setActionHandler('play', () => resume());
+        navigator.mediaSession.setActionHandler('pause', () => pause());
+        navigator.mediaSession.setActionHandler('previoustrack', () => prevTrack());
+        navigator.mediaSession.setActionHandler('nexttrack', () => nextTrack());
+        navigator.mediaSession.setActionHandler('seekbackward', () => skipSeconds(-15));
+        navigator.mediaSession.setActionHandler('seekforward', () => skipSeconds(30));
+      } catch (e) {
+        console.warn('MediaSession error', e);
+      }
+    }
+  }, [currentAudio, isPlaying]);
+
+  const handleTrackEnd = () => {
+    if (playMode === 'repeat-one') {
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
+      }
+      return;
+    }
+
+    if (settings.autoPlayNext) {
+      nextTrack();
+    }
+  };
 
   const playAudio = async (audio: AudioItem, newQueue?: AudioItem[]) => {
-    if (newQueue && newQueue.length > 0) {
+    if (newQueue) {
       setQueue(newQueue);
     }
+
     setCurrentAudio(audio);
-    setCurrentTime(0);
-    setDuration(audio.duration);
     setIsLoading(true);
 
+    // Save to history
     StorageService.addToHistory(audio.id);
 
-    // Rule 1: Check if audio is downloaded locally
-    const isLocal = StorageService.isDownloaded(audio.id);
     let srcToPlay: string | null = null;
+    const isLocal = StorageService.isDownloaded(audio.id);
 
+    // Rule 1: Always prioritize offline local copy if downloaded
     if (isLocal) {
       srcToPlay = await StorageService.getOfflineAudioUrl(audio.id);
       if (srcToPlay) {
@@ -420,10 +491,6 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const prevTrack = () => {
     if (!currentAudio) return;
-    if (currentTime > 3) {
-      seek(0);
-      return;
-    }
     const currentIndex = queue.findIndex(item => item.id === currentAudio.id);
     if (currentIndex > 0) {
       playAudio(queue[currentIndex - 1]);
@@ -440,13 +507,20 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   const toggleFavorite = (id: string) => {
-    const updated = StorageService.toggleFavorite(id);
+    const isFav = favorites.includes(id);
+    let updated: string[];
+    if (isFav) {
+      updated = favorites.filter(favId => favId !== id);
+      showToast('পছন্দের তালিকা থেকে বাদ দেওয়া হয়েছে', 'info');
+    } else {
+      updated = [...favorites, id];
+      showToast('পছন্দের তালিকায় যুক্ত হয়েছে', 'success');
+    }
     setFavorites(updated);
-    const isNowFav = updated.includes(id);
-    showToast(isNowFav ? 'পছন্দের তালিকায় যুক্ত হয়েছে' : 'পছন্দের তালিকা থেকে সরানো হয়েছে', 'success');
+    StorageService.saveFavorites(updated);
   };
 
-  const isFavorite = (id: string): boolean => {
+  const isFavorite = (id: string) => {
     return favorites.includes(id);
   };
 
@@ -540,14 +614,14 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     try {
       await StorageService.clearAllDownloads();
       setDownloads([]);
-      showToast('সকল ডাউনলোড সফলভাবে মুছে ফেলা হয়েছে', 'info');
+      showToast('সকল ডাউনলোড মুছে ফেলা হয়েছে', 'info');
     } catch (e) {
       console.error('Failed to clear downloads:', e);
     }
   };
 
-  const isDownloaded = (id: string): boolean => {
-    return downloads.some(d => d.id === id);
+  const isDownloaded = (id: string) => {
+    return StorageService.isDownloaded(id);
   };
 
   const updateSettings = (newSettings: Partial<PlayerSettings>) => {
@@ -560,6 +634,16 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   return (
     <AudioPlayerContext.Provider
       value={{
+        // Dynamic Catalog
+        catalog,
+        audios: catalog.audios,
+        speakers: catalog.speakers,
+        categories: catalog.categories,
+        isCatalogLoading,
+        catalogLastUpdated: catalog.lastUpdated,
+        refreshCatalog,
+
+        // Playback state
         currentAudio,
         isPlaying,
         isLoading,

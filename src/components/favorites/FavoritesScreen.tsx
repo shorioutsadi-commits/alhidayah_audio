@@ -1,7 +1,6 @@
 import React from 'react';
 import { Heart, Play, ArrowRight } from 'lucide-react';
 import { useAudioPlayer } from '../../context/AudioPlayerContext';
-import { AUDIOS_DATA } from '../../data/mockAudioData';
 import { AudioCard } from '../home/AudioCard';
 import { toBengaliNumber } from '../../utils/bengaliUtils';
 import { TabType } from '../common/BottomNav';
@@ -11,9 +10,9 @@ interface FavoritesScreenProps {
 }
 
 export const FavoritesScreen: React.FC<FavoritesScreenProps> = ({ onNavigateTab }) => {
-  const { favorites, playAudio } = useAudioPlayer();
+  const { audios, favorites, playAudio } = useAudioPlayer();
 
-  const favoriteAudios = AUDIOS_DATA.filter(audio => favorites.includes(audio.id));
+  const favoriteAudios = audios.filter(audio => favorites.includes(audio.id));
 
   return (
     <div className="pb-32 px-4 pt-4 max-w-md mx-auto space-y-4">

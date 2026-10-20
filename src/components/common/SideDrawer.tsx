@@ -13,7 +13,8 @@ import {
   Share2, 
   MessageSquare,
   ChevronRight,
-  ExternalLink
+  ExternalLink,
+  RefreshCw
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { toBengaliNumber } from '../../utils/bengaliUtils';
@@ -41,7 +42,7 @@ export const SideDrawer: React.FC<SideDrawerProps> = ({
   onOpenInstallModal,
   onOpenSleepTimer
 }) => {
-  const { downloads, favorites, sleepTimerMinutes, showToast } = useAudioPlayer();
+  const { downloads, favorites, sleepTimerMinutes, showToast, catalog, refreshCatalog, isCatalogLoading } = useAudioPlayer();
 
   if (!isOpen) return null;
 
@@ -222,6 +223,22 @@ export const SideDrawer: React.FC<SideDrawerProps> = ({
                 <span>সেটিংস</span>
               </div>
               <ChevronRight className="w-4 h-4 text-stone-400" />
+            </button>
+
+            <button
+              onClick={async () => {
+                await refreshCatalog(true);
+              }}
+              disabled={isCatalogLoading}
+              className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-orange-50 text-stone-700 hover:text-orange-600 text-sm font-medium transition-colors cursor-pointer"
+            >
+              <div className="flex items-center gap-3">
+                <RefreshCw className={`w-4 h-4 text-orange-500 ${isCatalogLoading ? 'animate-spin' : ''}`} />
+                <span>নতুন অডিও আপডেট দেখুন</span>
+              </div>
+              <span className="text-[11px] bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full font-semibold">
+                {isCatalogLoading ? 'খোঁজা হচ্ছে' : `${toBengaliNumber(catalog.totalAudios)}টি অডিও`}
+              </span>
             </button>
           </div>
 
