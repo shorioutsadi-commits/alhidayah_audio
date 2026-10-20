@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0",
-  "lastUpdated": "2026-10-20T08:08:54.497Z",
+  "version": "1.1.0",
+  "lastUpdated": "2026-10-20T09:56:39.342Z",
   "totalAudios": 23,
   "categories": [
     {
@@ -8,7 +8,7 @@
       "name": "ঈমান ও আকীদা",
       "iconName": "ShieldCheck",
       "description": "সহীহ আকিদা, তাওহীদ ও ঈমান মজবুত করার মূলনীতি",
-      "audioCount": 48,
+      "audioCount": 8,
       "color": "from-amber-500 to-orange-600"
     },
     {
@@ -16,7 +16,7 @@
       "name": "কুরআন তিলাওয়াত ও অর্থ",
       "iconName": "BookOpen",
       "description": "মধুর কণ্ঠে কুরআন তেলাওয়াত ও প্রাঞ্জল বাংলা অনুবাদ",
-      "audioCount": 114,
+      "audioCount": 2,
       "color": "from-orange-500 to-red-600"
     },
     {
@@ -24,7 +24,7 @@
       "name": "সীরাতুন্নবী (সা:) ও সাহাবা",
       "iconName": "Compass",
       "description": "রাসূলুল্লাহ (সা:) এর পুণ্যময় জীবনী ও সাহাবাদের আদর্শ",
-      "audioCount": 36,
+      "audioCount": 2,
       "color": "from-orange-400 to-amber-600"
     },
     {
@@ -32,7 +32,7 @@
       "name": "পরিবার ও সমাজ সংস্কার",
       "iconName": "Users",
       "description": "পিতা-মাতার হক, দাম্পত্য জীবন ও সন্তান লালন-পালন",
-      "audioCount": 52,
+      "audioCount": 3,
       "color": "from-amber-600 to-orange-700"
     },
     {
@@ -40,7 +40,7 @@
       "name": "তাওবা ও আত্মশুদ্ধি",
       "iconName": "Heart",
       "description": "গুনাহ বর্জন, ইস্তিগফার ও কলবের প্রশান্তি",
-      "audioCount": 40,
+      "audioCount": 2,
       "color": "from-orange-600 to-rose-600"
     },
     {
@@ -64,18 +64,18 @@
       "name": "প্রশ্ন ও উত্তর পর্ব",
       "iconName": "HelpCircle",
       "description": "সাধারণ মানুষের নিত্যদিনের জীবনঘনিষ্ঠ প্রশ্নের জবাব",
-      "audioCount": 65,
+      "audioCount": 1,
       "color": "from-amber-500 to-orange-500"
     }
   ],
   "speakers": [
     {
       "id": "spk-abu-bakar-zakaria",
-      "name": "শাইখ ড. আবু বকর মুহাম্মাদ জাকারিয়া",
+      "name": "শাইখ ড. আবু বকর মুহাম্মদ জাকারিয়া",
       "title": "প্রফেসর, আল-ফিকহ ও ল’ বিভাগ, ইসলামী বিশ্ববিদ্যালয়",
       "image": "./speakers/speaker_1_abu_bakar_zakaria.jpg",
       "bio": "মদিনা ইসলামিক বিশ্ববিদ্যালয় থেকে পিএইচডি ডিগ্রিধারী। তাফসীরে তাওযীহুল কুরআনের প্রণেতা এবং আন্তর্জাতিক খ্যাতিসম্পন্ন ইসলামিক স্কলার।",
-      "totalAudios": 64,
+      "totalAudios": 4,
       "category": "আকীদা ও তাফসীর"
     },
     {
@@ -84,7 +84,7 @@
       "title": "মুহাদ্দিস ও বিশিষ্ট ইসলামিক দাঈ (জুবাইল, কেএসএ)",
       "image": "./speakers/speaker_2_motiur_rahman_madani.jpg",
       "bio": "মদিনা ইসলামিক বিশ্ববিদ্যালয় থেকে উচ্চশিক্ষা সম্পন্নকারী। সহীহ সুন্নাহ প্রচার ও বেদআত বর্জনে তিন দশকেরও বেশি সময় ধরে নিবেদিত।",
-      "totalAudios": 85,
+      "totalAudios": 3,
       "category": "সহীহ হাদিস ও সুন্নাহ"
     },
     {
@@ -93,7 +93,7 @@
       "title": "প্রখ্যাত লেখক, গবেষক ও অনুবাদক",
       "image": "./speakers/speaker_3_abdul_hamid_faizi.jpg",
       "bio": "সহীহ বুখারী ও রিয়াযুস স্বালেহীনের নির্ভরযোগ্য বাংলা ব্যাখ্যাকারক এবং অসংখ্য গবেষণাধর্মী ইসলামিক গ্রন্থের প্রণেতা।",
-      "totalAudios": 52,
+      "totalAudios": 1,
       "category": "হাদিস ও গ্রন্থ পর্যালোচনা"
     },
     {
@@ -102,7 +102,7 @@
       "title": "সহযোগী অধ্যাপক ও ইসলামিক চিন্তাবিদ",
       "image": "./speakers/speaker_4_manzoor_e_elahi.png",
       "bio": "মদিনা বিশ্ববিদ্যালয় থেকে ইসলামিক স্টাডিজে পিএইচডি ডিগ্রিধারী। জাতীয় বিশ্ববিদ্যালয়ের শিক্ষক ও প্রাঞ্জল উপস্থাপক।",
-      "totalAudios": 47,
+      "totalAudios": 1,
       "category": "ফিকহ ও পারিবারিক বিধান"
     },
     {
@@ -111,7 +111,7 @@
       "title": "বিশিষ্ট গবেষক ও ফতোয়া বিশেষজ্ঞ",
       "image": "./speakers/speaker_5_saifullah_madani.png",
       "bio": "মদিনা ইসলামিক বিশ্ববিদ্যালয় থেকে ডিগ্রিপ্রাপ্ত। সমসাময়িক প্রশ্নোত্তর ও ফিকহি জটিল বিষয়ে গবেষণালব্ধ বক্তব্য প্রদান করেন।",
-      "totalAudios": 73,
+      "totalAudios": 1,
       "category": "প্রশ্নোত্তর ও ফিকহ"
     },
     {
@@ -120,7 +120,7 @@
       "title": "প্রখ্যাত মুহাদ্দিস ও ইসলামিক গবেষক",
       "image": "./speakers/speaker_6_shahidullah_khan.jpg",
       "bio": "শান্ত-শিষ্ট ভাবগাম্ভীর্যপূর্ণ আলোচনার জন্য সুপরিচিত। সহীহ আকিদা ও ইবাদতের বিশুদ্ধতার বিষয়ে নিবেদিতপ্রাণ।",
-      "totalAudios": 39,
+      "totalAudios": 1,
       "category": "সহীহ আকিদা"
     },
     {
@@ -129,7 +129,7 @@
       "title": "বিশিষ্ট দাঈ ও মিডিয়া ব্যক্তিত্ব",
       "image": "./speakers/speaker_7_mostafizur_rahman.jpg",
       "bio": "সহজ-সরল ভাষায় সাধারণ মানুষের কাছে সহীহ দ্বীন পৌঁছে দিতে সুপরিচিত ইসলামিক ব্যক্তিত্ব।",
-      "totalAudios": 36,
+      "totalAudios": 1,
       "category": "দ্বীনী জীবনযাপন"
     },
     {
@@ -156,7 +156,7 @@
       "title": "প্রতিষ্ঠাতা, আল-জামিআহ আস-সালাফিয়্যাহ, রাজশাহী",
       "image": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=400",
       "bio": "হৃদয়কাঁপানো জোরালো বক্তব্য ও সহীহ সুন্নাহ বাস্তবায়নের আহ্বানে দেশের সর্বত্র বিপুল জনপ্রিয় ইসলামিক বক্তা।",
-      "totalAudios": 98,
+      "totalAudios": 2,
       "category": "আমল ও নসীহত"
     },
     {
@@ -165,7 +165,7 @@
       "title": "ইসলামিক গবেষক, শিক্ষক ও গ্রন্থকার",
       "image": "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=400",
       "bio": "জাল হাদিসের বিরুদ্ধে গবেষণা ও সহীহ সুন্নাহভিত্তিক সালাতের সঠিক নিয়ম বর্ণনায় অনন্য অবদান রেখেছেন।",
-      "totalAudios": 45,
+      "totalAudios": 1,
       "category": "জাল হাদিস ও সহীহ সুন্নাহ"
     },
     {
@@ -174,7 +174,7 @@
       "title": "শিক্ষাবিদ, গবেষক ও ইসলামিক চিন্তাবিদ",
       "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=400",
       "bio": "আধুনিক জ্ঞান-বিজ্ঞান ও ইসলামী শিক্ষার সমন্বয়ে গবেষণাধর্মী আলোচনার জন্য সমাদৃত ব্যক্তিত্ব।",
-      "totalAudios": 31,
+      "totalAudios": 1,
       "category": "ইসলাম ও সমকালীন সমাজ"
     },
     {
@@ -183,7 +183,7 @@
       "title": "বিশিষ্ট দাঈ ও ইসলামিক আলোচক",
       "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400",
       "bio": "শুদ্ধ উচ্চারণে দলীলভিত্তিক বক্তব্য প্রদানকারী অন্যতম সুবক্তা ও ইসলামিক গবেষক।",
-      "totalAudios": 42,
+      "totalAudios": 1,
       "category": "আকীদা ও আমল"
     },
     {
@@ -273,7 +273,7 @@
       "title": "বিশিষ্ট ইসলামিক চিন্তাবিদ ও দাঈ",
       "image": "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=400",
       "bio": "জুবাইল ইসলামিক সেন্টারের সাবেক দাঈ। প্রাঞ্জল বাংলা উপস্থাপনায় ইসলামের সৌন্দর্য তুলে ধরেন।",
-      "totalAudios": 44,
+      "totalAudios": 1,
       "category": "দাওয়াহ ও জীবনযাপন"
     },
     {
@@ -345,7 +345,7 @@
       "title": "আমীর, আহলেহাদীছ আন্দোলন বাংলাদেশ ও সাবেক প্রফেসর, রাবি",
       "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400",
       "bio": "রাজশাহী বিশ্ববিদ্যালয়ের আরবি বিভাগের সাবেক প্রফেসর ও বিভাগীয় প্রধান। তাফসীরুল কুরআন ও সালাতুর রাসূল (ছা:) এর সুখ্যাত রচয়িতা।",
-      "totalAudios": 110,
+      "totalAudios": 3,
       "category": "তাফসীর ও সংস্কার আন্দোলন"
     },
     {
@@ -408,7 +408,7 @@
       "title": "লেখক, গবেষক ও দাঈ",
       "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=400",
       "bio": "ইসলাম হাউজসহ বহু আর্ন্তজাতিক ইসলামিক ওয়েবসাইটে বহু মূল্যবান গ্রন্থের লেখক ও গবেষক।",
-      "totalAudios": 40,
+      "totalAudios": 1,
       "category": "অনুবাদ ও প্রবন্ধ"
     },
     {
@@ -417,57 +417,74 @@
       "title": "প্রখ্যাত হাদিস বিশারদ (রহ.)",
       "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=400",
       "bio": "রিয়াদের ইমাম মুহাম্মদ ইবনে সউদ বিশ্ববিদ্যালয় থেকে পিএইচডি ডিগ্রিধারী। বই ও বয়ানের মাধ্যমে সহীহ সুন্নাহ প্রচারের পুরোধা ব্যক্তিত্ব।",
-      "totalAudios": 35,
+      "totalAudios": 1,
       "category": "হাদিস ও আকীদা"
     }
   ],
   "audios": [
     {
       "id": "aud-abz-1",
-      "title": "তাওহীদের মূলনীতি ও শিরক থেকে বাঁচার উপায়",
+      "title": "কিতাবুত তাওহীদের ব্যাখ্যা — পর্ব ১",
       "speakerId": "spk-abu-bakar-zakaria",
-      "speakerName": "শাইখ ড. আবু বকর মুহাম্মাদ জাকারিয়া",
+      "speakerName": "শাইখ ড. আবু বকর মুহাম্মদ জাকারিয়া",
       "speakerImage": "./speakers/speaker_1_abu_bakar_zakaria.jpg",
       "category": "ঈমান ও আকীদা",
-      "description": "বিশুদ্ধ তাওহীদের গুরুত্ব এবং আমাদের সমাজে প্রচলিত শিরক ও কুসংস্কার চেনার প্রামাণ্য আলোচনা।",
-      "duration": 1140,
-      "audioUrl": "https://download.quranicaudio.com/quran/mishaari_raashid_al_3afaasee/001.mp3",
-      "fileSizeMb": 15.6,
-      "playCount": 28400,
-      "publishDate": "০১ অক্টোবর, ২০২৬",
+      "description": "শাইখুল ইসলাম মুহাম্মাদ ইবন আব্দুল ওয়াহহাব রহ.-এর প্রখ্যাত গ্রন্থ কিতাবুত তাওহীদের প্রামাণ্য ও বিস্তারিত ব্যাখ্যা — ১ম পর্ব।",
+      "duration": 5348,
+      "audioUrl": "https://archive.org/download/20261020_20261020_0602/%E0%A6%95%E0%A6%BF%E0%A6%A4%E0%A6%BE%E0%A6%AC%E0%A7%81%E0%A6%A4+%E0%A6%A4%E0%A6%BE%E0%A6%93%E0%A6%B9%E0%A7%80%E0%A6%A6%E0%A7%87%E0%A6%B0+%E0%A6%AC%E0%A7%8D%E0%A6%AF%E0%A6%BE%E0%A6%96%E2%80%8C%E0%A7%8D%E0%A6%AF%E0%A6%BE+1.mp3",
+      "fileSizeMb": 20.5,
+      "playCount": 41200,
+      "publishDate": "২০ অক্টোবর, ২০২৬",
       "isFeatured": true,
-      "seriesName": "তাওহীদ সিরিজ"
+      "seriesName": "কিতাবুত তাওহীদের ব্যাখ্যা"
     },
     {
       "id": "aud-abz-2",
-      "title": "কুরআনের তাফসীর বুঝার সহীহ পদ্ধতি",
+      "title": "কিতাবুত তাওহীদের ব্যাখ্যা — পর্ব ২",
       "speakerId": "spk-abu-bakar-zakaria",
-      "speakerName": "শাইখ ড. আবু বকর মুহাম্মাদ জাকারিয়া",
+      "speakerName": "শাইখ ড. আবু বকর মুহাম্মদ জাকারিয়া",
       "speakerImage": "./speakers/speaker_1_abu_bakar_zakaria.jpg",
-      "category": "কুরআন তিলাওয়াত ও অর্থ",
-      "description": "সালাফদের নীতি অনুসারে কুরআনের আয়াতের সঠিক মর্মার্থ অনুধাবনের নিয়মাবলী।",
-      "duration": 980,
-      "audioUrl": "https://download.quranicaudio.com/quran/mishaari_raashid_al_3afaasee/036.mp3",
-      "fileSizeMb": 13.2,
-      "playCount": 19200,
-      "publishDate": "০৪ অক্টোবর, ২০২৬",
-      "isFeatured": false
+      "category": "ঈমান ও আকীদা",
+      "description": "কিতাবুত তাওহীদের প্রামাণ্য ও বিস্তারিত ব্যাখ্যা — ২য় পর্ব।",
+      "duration": 4615,
+      "audioUrl": "https://archive.org/download/20261020_20261020_0602/%E0%A6%95%E0%A6%BF%E0%A6%A4%E0%A6%BE%E0%A6%AC%E0%A7%81%E0%A6%A4+%E0%A6%A4%E0%A6%BE%E0%A6%93%E0%A6%B9%E0%A7%80%E0%A6%A6%E0%A7%87%E0%A6%B0+%E0%A6%AC%E0%A7%8D%E0%A6%AF%E0%A6%BE%E0%A6%96%E2%80%8C%E0%A7%8D%E0%A6%AF%E0%A6%BE+2.mp3",
+      "fileSizeMb": 17.7,
+      "playCount": 32600,
+      "publishDate": "২০ অক্টোবর, ২০২৬",
+      "isFeatured": false,
+      "seriesName": "কিতাবুত তাওহীদের ব্যাখ্যা"
     },
     {
       "id": "aud-abz-3",
-      "title": "তাওহীদ ও ঈমান",
+      "title": "কিতাবুত তাওহীদের ব্যাখ্যা — পর্ব ৩",
       "speakerId": "spk-abu-bakar-zakaria",
-      "speakerName": "শাইখ ড. আবু বকর মুহাম্মাদ জাকারিয়া",
+      "speakerName": "শাইখ ড. আবু বকর মুহাম্মদ জাকারিয়া",
       "speakerImage": "./speakers/speaker_1_abu_bakar_zakaria.jpg",
       "category": "ঈমান ও আকীদা",
-      "description": "সহীহ তাওহীদের স্বরূপ, ঈমানের মৌলিক স্তম্ভ এবং দৈনন্দিন জীবনে শিরক থেকে মুক্ত থাকার প্রামাণ্য দিকনির্দেশনা।",
-      "duration": 5715,
-      "audioUrl": "https://archive.org/download/kitab-at-tawheed-by-abu-bakar-zakaria/Kitab%20At%20Tawheed%20U02-03%20By%20Abu%20Bakar%20Zakaria.mp3",
-      "fileSizeMb": 23.6,
-      "playCount": 38200,
-      "publishDate": "১৪ অক্টোবর, ২০২৬",
-      "isFeatured": true,
-      "seriesName": "তাওহীদ ও ঈমান"
+      "description": "কিতাবুত তাওহীদের প্রামাণ্য ও বিস্তারিত ব্যাখ্যা — ৩য় পর্ব।",
+      "duration": 4418,
+      "audioUrl": "https://archive.org/download/20261020_20261020_0602/%E0%A6%95%E0%A6%BF%E0%A6%A4%E0%A6%BE%E0%A6%AC%E0%A7%81%E0%A6%A4+%E0%A6%A4%E0%A6%BE%E0%A6%93%E0%A6%B9%E0%A7%80%E0%A6%A6%E0%A7%87%E0%A6%B0+%E0%A6%AC%E0%A7%8D%E0%A6%AF%E0%A6%BE%E0%A6%96%E2%80%8C%E0%A7%8D%E0%A6%AF%E0%A6%BE+3.mp3",
+      "fileSizeMb": 16.9,
+      "playCount": 27900,
+      "publishDate": "২০ অক্টোবর, ২০২৬",
+      "isFeatured": false,
+      "seriesName": "কিতাবুত তাওহীদের ব্যাখ্যা"
+    },
+    {
+      "id": "aud-abz-4",
+      "title": "কিতাবুত তাওহীদের ব্যাখ্যা — পর্ব ৪",
+      "speakerId": "spk-abu-bakar-zakaria",
+      "speakerName": "শাইখ ড. আবু বকর মুহাম্মদ জাকারিয়া",
+      "speakerImage": "./speakers/speaker_1_abu_bakar_zakaria.jpg",
+      "category": "ঈমান ও আকীদা",
+      "description": "কিতাবুত তাওহীদের প্রামাণ্য ও বিস্তারিত ব্যাখ্যা — ৪র্থ পর্ব।",
+      "duration": 4449,
+      "audioUrl": "https://archive.org/download/20261020_20261020_0602/%E0%A6%95%E0%A6%BF%E0%A6%A4%E0%A6%BE%E0%A6%AC%E0%A7%81%E0%A6%A4+%E0%A6%A4%E0%A6%BE%E0%A6%93%E0%A6%B9%E0%A7%80%E0%A6%A6%E0%A7%87%E0%A6%B0+%E0%A6%AC%E0%A7%8D%E0%A6%AF%E0%A6%BE%E0%A6%96%E2%80%8C%E0%A7%8D%E0%A6%AF%E0%A6%BE+4.mp3",
+      "fileSizeMb": 17,
+      "playCount": 25400,
+      "publishDate": "২০ অক্টোবর, ২০২৬",
+      "isFeatured": false,
+      "seriesName": "কিতাবুত তাওহীদের ব্যাখ্যা"
     },
     {
       "id": "aud-mrm-1",
@@ -702,21 +719,6 @@
       "publishDate": "০৮ সেপ্টেম্বর, ২০২৬",
       "isFeatured": false,
       "seriesName": "রাহে বেলায়াত সিরিজ"
-    },
-    {
-      "id": "aud-quran-1",
-      "title": "সূরা আর-রহমান মধুর বাংলা অনুবাদ ও তাফসীর",
-      "speakerId": "spk-abu-bakar-zakaria",
-      "speakerName": "শাইখ ড. আবু বকর মুহাম্মাদ জাকারিয়া",
-      "speakerImage": "./speakers/speaker_1_abu_bakar_zakaria.jpg",
-      "category": "কুরআন তিলাওয়াত ও অর্থ",
-      "description": "সূরা আর-রহমানের প্রাঞ্জল বাংলা অনুবাদ ও আল্লাহর অগণিত নিয়ামতের শুকরিয়া আদায়ের বার্তা।",
-      "duration": 980,
-      "audioUrl": "https://download.quranicaudio.com/quran/mishaari_raashid_al_3afaasee/055.mp3",
-      "fileSizeMb": 14.2,
-      "playCount": 34100,
-      "publishDate": "১২ সেপ্টেম্বর, ২০২৬",
-      "isFeatured": true
     },
     {
       "id": "aud-quran-2",

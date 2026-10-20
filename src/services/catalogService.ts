@@ -24,8 +24,8 @@ const CATALOG_META_KEY = 'al_hidayah_catalog_meta_v1';
 
 // Initial bundled fallback catalog ensuring 100% offline reliability
 export const INITIAL_FALLBACK_CATALOG: AudioCatalog = {
-  version: '1.0.0',
-  lastUpdated: '2026-10-20T00:00:00.000Z',
+  version: '1.1.0',
+  lastUpdated: '2026-10-20T08:00:00.000Z',
   totalAudios: AUDIOS_DATA.length,
   categories: CATEGORIES_DATA,
   speakers: SPEAKERS_DATA,
@@ -58,7 +58,7 @@ export function normalizeCatalog(raw: any): AudioCatalog {
     ).length;
     return {
       ...spk,
-      totalAudios: Math.max(count, spk.totalAudios || 0),
+      totalAudios: count > 0 ? count : (spk.totalAudios || 0),
     };
   });
 
@@ -82,7 +82,7 @@ export function normalizeCatalog(raw: any): AudioCatalog {
     const count = audios.filter((a) => a.category.trim() === cat.name.trim()).length;
     return {
       ...cat,
-      audioCount: Math.max(count, cat.audioCount || 0),
+      audioCount: count > 0 ? count : (cat.audioCount || 0),
     };
   });
 

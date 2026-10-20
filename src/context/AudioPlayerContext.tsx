@@ -248,6 +248,15 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
     const handleError = (e: Event) => {
       console.warn('Audio playback error event:', e);
+      if (audio.src && audio.src.includes('20261020_20261020_0602') && !audio.src.includes('%E0%A6%86%E0%A6%AC%E0%A7%81')) {
+        const subfolder = '%E0%A6%86%E0%A6%AC%E0%A7%81%20%E0%A6%AC%E0%A6%95%E0%A6%B0%20%E0%A6%AE%E0%A7%81%E0%A6%B9%E0%A6%BE%E0%A6%AE%E0%A7%8D%E0%A6%AE%E0%A6%BE%E0%A6%A6%20%E0%A6%AF%E0%A6%BE%E0%A6%95%E0%A6%BE%E0%A6%B0%E0%A6%BF%E0%A7%9F%E0%A6%BE/';
+        audio.src = audio.src.replace('20261020_20261020_0602/', `20261020_20261020_0602/${subfolder}`);
+        audio.play().then(() => setIsPlaying(true)).catch(() => {
+          setIsLoading(false);
+          setIsPlaying(false);
+        });
+        return;
+      }
       setIsLoading(false);
       setIsPlaying(false);
     };
@@ -405,7 +414,20 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
             console.warn('Fallback online stream failed:', eOffline);
           }
         }
-        // Fallback 2: if archive.org redirect fails, try direct edge mirror
+        // Fallback 2: if archive.org nested path is needed
+        if (srcToPlay.includes('20261020_20261020_0602') && !srcToPlay.includes('%E0%A6%86%E0%A6%AC%E0%A7%81')) {
+          const subfolder = '%E0%A6%86%E0%A6%AC%E0%A7%81%20%E0%A6%AC%E0%A6%95%E0%A6%B0%20%E0%A6%AE%E0%A7%81%E0%A6%B9%E0%A6%BE%E0%A6%AE%E0%A7%8D%E0%A6%AE%E0%A6%BE%E0%A6%A6%20%E0%A6%AF%E0%A6%BE%E0%A6%95%E0%A6%BE%E0%A6%B0%E0%A6%BF%E0%A7%9F%E0%A6%BE/';
+          const nestedUrl = srcToPlay.replace('20261020_20261020_0602/', `20261020_20261020_0602/${subfolder}`);
+          try {
+            audioRef.current.src = nestedUrl;
+            await audioRef.current.play();
+            setIsPlaying(true);
+            return;
+          } catch (eNested) {
+            console.warn('Archive nested path stream failed:', eNested);
+          }
+        }
+        // Fallback 3: if archive.org redirect fails, try direct edge mirror
         if (srcToPlay.includes('archive.org/download/')) {
           const directMirror = srcToPlay.replace('https://archive.org/download/', 'https://dn710002.ca.archive.org/0/items/');
           try {
@@ -549,26 +571,27 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
       // Fetch actual audio binary data
       let blob: Blob | undefined;
-      try {
-        const response = await fetch(audio.audioUrl, { mode: 'cors' });
-        if (response.ok) {
-          const fetchedBlob = await response.blob();
-          if (fetchedBlob.size > 1024) {
-            blob = fetchedBlob;
-          }
-        }
-      } catch (e) {
-        console.warn('CORS or direct fetch error during download, trying fallback node:', e);
-        if (audio.audioUrl.includes('archive.org/download/')) {
-          const directMirror = audio.audioUrl.replace('https://archive.org/download/', 'https://dn710002.ca.archive.org/0/items/');
-          try {
-            const resp2 = await fetch(directMirror, { mode: 'cors' });
-            if (resp2.ok) {
-              blob = await resp2.blob();
+      const downloadUrls: string[] = [audio.audioUrl];
+      if (audio.audioUrl.includes('20261020_20261020_0602') && !audio.audioUrl.includes('%E0%A6%86%E0%A6%AC%E0%A7%81')) {
+        const subfolder = '%E0%A6%86%E0%A6%AC%E0%A7%81%20%E0%A6%AC%E0%A6%95%E0%A6%B0%20%E0%A6%AE%E0%A7%81%E0%A6%B9%E0%A6%BE%E0%A6%AE%E0%A7%8D%E0%A6%AE%E0%A6%BE%E0%A6%A6%20%E0%A6%AF%E0%A6%BE%E0%A6%95%E0%A6%BE%E0%A6%B0%E0%A6%BF%E0%A7%9F%E0%A6%BE/';
+        downloadUrls.push(audio.audioUrl.replace('20261020_20261020_0602/', `20261020_20261020_0602/${subfolder}`));
+      }
+      if (audio.audioUrl.includes('archive.org/download/')) {
+        downloadUrls.push(audio.audioUrl.replace('https://archive.org/download/', 'https://dn710002.ca.archive.org/0/items/'));
+      }
+
+      for (const dUrl of downloadUrls) {
+        try {
+          const response = await fetch(dUrl, { mode: 'cors' });
+          if (response.ok) {
+            const fetchedBlob = await response.blob();
+            if (fetchedBlob.size > 1024) {
+              blob = fetchedBlob;
+              break;
             }
-          } catch (e2) {
-            console.warn('Mirror download failed:', e2);
           }
+        } catch (e) {
+          console.warn('Fetch error during download for url:', dUrl, e);
         }
       }
 

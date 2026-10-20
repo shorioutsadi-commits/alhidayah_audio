@@ -4,11 +4,11 @@ export const SPEAKERS_DATA: Speaker[] = [
   // User requested prominent scholars & Da'is
   {
     id: 'spk-abu-bakar-zakaria',
-    name: 'শাইখ ড. আবু বকর মুহাম্মাদ জাকারিয়া',
+    name: 'শাইখ ড. আবু বকর মুহাম্মদ জাকারিয়া',
     title: 'প্রফেসর, আল-ফিকহ ও ল’ বিভাগ, ইসলামী বিশ্ববিদ্যালয়',
     image: './speakers/speaker_1_abu_bakar_zakaria.jpg',
     bio: 'মদিনা ইসলামিক বিশ্ববিদ্যালয় থেকে পিএইচডি ডিগ্রিধারী। তাফসীরে তাওযীহুল কুরআনের প্রণেতা এবং আন্তর্জাতিক খ্যাতিসম্পন্ন ইসলামিক স্কলার।',
-    totalAudios: 64,
+    totalAudios: 4,
     category: 'আকীদা ও তাফসীর'
   },
   {
@@ -424,53 +424,70 @@ export const CATEGORIES_DATA: Category[] = [
 ];
 
 export const AUDIOS_DATA: AudioItem[] = [
-  // Dr. Abu Bakar Muhammad Zakaria
+  // Dr. Abu Bakar Muhammad Zakaria - Kitabut Tawheed Series (4 Episodes)
   {
     id: 'aud-abz-1',
-    title: 'তাওহীদের মূলনীতি ও শিরক থেকে বাঁচার উপায়',
+    title: 'কিতাবুত তাওহীদের ব্যাখ্যা — পর্ব ১',
     speakerId: 'spk-abu-bakar-zakaria',
-    speakerName: 'শাইখ ড. আবু বকর মুহাম্মাদ জাকারিয়া',
+    speakerName: 'শাইখ ড. আবু বকর মুহাম্মদ জাকারিয়া',
     speakerImage: './speakers/speaker_1_abu_bakar_zakaria.jpg',
     category: 'ঈমান ও আকীদা',
-    description: 'বিশুদ্ধ তাওহীদের গুরুত্ব এবং আমাদের সমাজে প্রচলিত শিরক ও কুসংস্কার চেনার প্রামাণ্য আলোচনা।',
-    duration: 1140,
-    audioUrl: 'https://download.quranicaudio.com/quran/mishaari_raashid_al_3afaasee/001.mp3',
-    fileSizeMb: 15.6,
-    playCount: 28400,
-    publishDate: '০১ অক্টোবর, ২০২৬',
+    description: 'শাইখুল ইসলাম মুহাম্মাদ ইবন আব্দুল ওয়াহহাব রহ.-এর প্রখ্যাত গ্রন্থ কিতাবুত তাওহীদের প্রামাণ্য ও বিস্তারিত ব্যাখ্যা — ১ম পর্ব।',
+    duration: 5348,
+    audioUrl: 'https://archive.org/download/20261020_20261020_0602/%E0%A6%95%E0%A6%BF%E0%A6%A4%E0%A6%BE%E0%A6%AC%E0%A7%81%E0%A6%A4+%E0%A6%A4%E0%A6%BE%E0%A6%93%E0%A6%B9%E0%A7%80%E0%A6%A6%E0%A7%87%E0%A6%B0+%E0%A6%AC%E0%A7%8D%E0%A6%AF%E0%A6%BE%E0%A6%96%E2%80%8C%E0%A7%8D%E0%A6%AF%E0%A6%BE+1.mp3',
+    fileSizeMb: 20.5,
+    playCount: 41200,
+    publishDate: '২০ অক্টোবর, ২০২৬',
     isFeatured: true,
-    seriesName: 'তাওহীদ সিরিজ'
+    seriesName: 'কিতাবুত তাওহীদের ব্যাখ্যা'
   },
   {
     id: 'aud-abz-2',
-    title: 'কুরআনের তাফসীর বুঝার সহীহ পদ্ধতি',
+    title: 'কিতাবুত তাওহীদের ব্যাখ্যা — পর্ব ২',
     speakerId: 'spk-abu-bakar-zakaria',
-    speakerName: 'শাইখ ড. আবু বকর মুহাম্মাদ জাকারিয়া',
+    speakerName: 'শাইখ ড. আবু বকর মুহাম্মদ জাকারিয়া',
     speakerImage: './speakers/speaker_1_abu_bakar_zakaria.jpg',
-    category: 'কুরআন তিলাওয়াত ও অর্থ',
-    description: 'সালাফদের নীতি অনুসারে কুরআনের আয়াতের সঠিক মর্মার্থ অনুধাবনের নিয়মাবলী।',
-    duration: 980,
-    audioUrl: 'https://download.quranicaudio.com/quran/mishaari_raashid_al_3afaasee/036.mp3',
-    fileSizeMb: 13.2,
-    playCount: 19200,
-    publishDate: '০৪ অক্টোবর, ২০২৬',
-    isFeatured: false
+    category: 'ঈমান ও আকীদা',
+    description: 'কিতাবুত তাওহীদের প্রামাণ্য ও বিস্তারিত ব্যাখ্যা — ২য় পর্ব।',
+    duration: 4615,
+    audioUrl: 'https://archive.org/download/20261020_20261020_0602/%E0%A6%95%E0%A6%BF%E0%A6%A4%E0%A6%BE%E0%A6%AC%E0%A7%81%E0%A6%A4+%E0%A6%A4%E0%A6%BE%E0%A6%93%E0%A6%B9%E0%A7%80%E0%A6%A6%E0%A7%87%E0%A6%B0+%E0%A6%AC%E0%A7%8D%E0%A6%AF%E0%A6%BE%E0%A6%96%E2%80%8C%E0%A7%8D%E0%A6%AF%E0%A6%BE+2.mp3',
+    fileSizeMb: 17.7,
+    playCount: 32600,
+    publishDate: '২০ অক্টোবর, ২০২৬',
+    isFeatured: false,
+    seriesName: 'কিতাবুত তাওহীদের ব্যাখ্যা'
   },
   {
     id: 'aud-abz-3',
-    title: 'তাওহীদ ও ঈমান',
+    title: 'কিতাবুত তাওহীদের ব্যাখ্যা — পর্ব ৩',
     speakerId: 'spk-abu-bakar-zakaria',
-    speakerName: 'শাইখ ড. আবু বকর মুহাম্মাদ জাকারিয়া',
+    speakerName: 'শাইখ ড. আবু বকর মুহাম্মদ জাকারিয়া',
     speakerImage: './speakers/speaker_1_abu_bakar_zakaria.jpg',
     category: 'ঈমান ও আকীদা',
-    description: 'সহীহ তাওহীদের স্বরূপ, ঈমানের মৌলিক স্তম্ভ এবং দৈনন্দিন জীবনে শিরক থেকে মুক্ত থাকার প্রামাণ্য দিকনির্দেশনা।',
-    duration: 5715,
-    audioUrl: 'https://archive.org/download/kitab-at-tawheed-by-abu-bakar-zakaria/Kitab%20At%20Tawheed%20U02-03%20By%20Abu%20Bakar%20Zakaria.mp3',
-    fileSizeMb: 23.6,
-    playCount: 38200,
-    publishDate: '১৪ অক্টোবর, ২০২৬',
-    isFeatured: true,
-    seriesName: 'তাওহীদ ও ঈমান'
+    description: 'কিতাবুত তাওহীদের প্রামাণ্য ও বিস্তারিত ব্যাখ্যা — ৩য় পর্ব।',
+    duration: 4418,
+    audioUrl: 'https://archive.org/download/20261020_20261020_0602/%E0%A6%95%E0%A6%BF%E0%A6%A4%E0%A6%BE%E0%A6%AC%E0%A7%81%E0%A6%A4+%E0%A6%A4%E0%A6%BE%E0%A6%93%E0%A6%B9%E0%A7%80%E0%A6%A6%E0%A7%87%E0%A6%B0+%E0%A6%AC%E0%A7%8D%E0%A6%AF%E0%A6%BE%E0%A6%96%E2%80%8C%E0%A7%8D%E0%A6%AF%E0%A6%BE+3.mp3',
+    fileSizeMb: 16.9,
+    playCount: 27900,
+    publishDate: '২০ অক্টোবর, ২০২৬',
+    isFeatured: false,
+    seriesName: 'কিতাবুত তাওহীদের ব্যাখ্যা'
+  },
+  {
+    id: 'aud-abz-4',
+    title: 'কিতাবুত তাওহীদের ব্যাখ্যা — পর্ব ৪',
+    speakerId: 'spk-abu-bakar-zakaria',
+    speakerName: 'শাইখ ড. আবু বকর মুহাম্মদ জাকারিয়া',
+    speakerImage: './speakers/speaker_1_abu_bakar_zakaria.jpg',
+    category: 'ঈমান ও আকীদা',
+    description: 'কিতাবুত তাওহীদের প্রামাণ্য ও বিস্তারিত ব্যাখ্যা — ৪র্থ পর্ব।',
+    duration: 4449,
+    audioUrl: 'https://archive.org/download/20261020_20261020_0602/%E0%A6%95%E0%A6%BF%E0%A6%A4%E0%A6%BE%E0%A6%AC%E0%A7%81%E0%A6%A4+%E0%A6%A4%E0%A6%BE%E0%A6%93%E0%A6%B9%E0%A7%80%E0%A6%A6%E0%A7%87%E0%A6%B0+%E0%A6%AC%E0%A7%8D%E0%A6%AF%E0%A6%BE%E0%A6%96%E2%80%8C%E0%A7%8D%E0%A6%AF%E0%A6%BE+4.mp3',
+    fileSizeMb: 17.0,
+    playCount: 25400,
+    publishDate: '২০ অক্টোবর, ২০২৬',
+    isFeatured: false,
+    seriesName: 'কিতাবুত তাওহীদের ব্যাখ্যা'
   },
 
   // Sheikh Motiur Rahman Madani
@@ -732,21 +749,7 @@ export const AUDIOS_DATA: AudioItem[] = [
     isFeatured: false,
     seriesName: 'রাহে বেলায়াত সিরিজ'
   },
-  {
-    id: 'aud-quran-1',
-    title: 'সূরা আর-রহমান মধুর বাংলা অনুবাদ ও তাফসীর',
-    speakerId: 'spk-abu-bakar-zakaria',
-    speakerName: 'শাইখ ড. আবু বকর মুহাম্মাদ জাকারিয়া',
-    speakerImage: './speakers/speaker_1_abu_bakar_zakaria.jpg',
-    category: 'কুরআন তিলাওয়াত ও অর্থ',
-    description: 'সূরা আর-রহমানের প্রাঞ্জল বাংলা অনুবাদ ও আল্লাহর অগণিত নিয়ামতের শুকরিয়া আদায়ের বার্তা।',
-    duration: 980,
-    audioUrl: 'https://download.quranicaudio.com/quran/mishaari_raashid_al_3afaasee/055.mp3',
-    fileSizeMb: 14.2,
-    playCount: 34100,
-    publishDate: '১২ সেপ্টেম্বর, ২০২৬',
-    isFeatured: true
-  },
+
   {
     id: 'aud-quran-2',
     title: 'সূরা আল-মুলক - কবরের আযাব থেকে সুরক্ষার তাফসীর',
