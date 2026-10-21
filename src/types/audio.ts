@@ -52,3 +52,16 @@ export interface PlayerSettings {
   downloadOverWifiOnly: boolean;
   notificationEnabled: boolean;
 }
+
+export interface PlaybackDiagnosticLog {
+  timestamp: string;
+  audioId: string;
+  audioTitle: string;
+  urlAttempted: string;
+  errorCode?: number;
+  errorName?: string;
+  errorMessage?: string;
+  networkOnline: boolean;
+  isDownloaded: boolean;
+  httpStatus?: number | string;
+}

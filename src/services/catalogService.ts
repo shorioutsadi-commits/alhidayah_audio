@@ -32,6 +32,46 @@ export const INITIAL_FALLBACK_CATALOG: AudioCatalog = {
   audios: AUDIOS_DATA,
 };
 
+// URL Sanitizer and normalizer ensuring direct valid streaming from Internet Archive & other hosts
+export function normalizeAudioUrl(url: string): string {
+  if (!url || typeof url !== 'string') return url;
+  let normalized = url.trim();
+
+  // 1. If it is an Archive.org details page URL (/details/), convert to direct download URL (/download/)
+  if (normalized.includes('archive.org/details/')) {
+    normalized = normalized.replace('archive.org/details/', 'archive.org/download/');
+  }
+
+  // 2. Internet Archive subfolder repair for item 20261020_20261020_0602
+  // Files in this archive item are stored inside the scholar subdirectory
+  if (
+    normalized.includes('20261020_20261020_0602') &&
+    !normalized.includes('%E0%A6%86%E0%A6%AC%E0%A7%81') &&
+    !normalized.includes('আবু')
+  ) {
+    const subfolder = '%E0%A6%86%E0%A6%AC%E0%A7%81%20%E0%A6%AC%E0%A6%95%E0%A6%B0%20%E0%A6%AE%E0%A7%81%E0%A6%B9%E0%A6%BE%E0%A6%AE%E0%A7%8D%E0%A6%AE%E0%A6%BE%E0%A6%A6%20%E0%A6%AF%E0%A6%BE%E0%A6%95%E0%A6%BE%E0%A6%B0%E0%A6%BF%E0%A7%9F%E0%A6%BE/';
+    normalized = normalized.replace('20261020_20261020_0602/', `20261020_20261020_0602/${subfolder}`);
+  }
+
+  // 3. Fix '+' to '%20' for spaces in URL path (Archive.org 404s when paths have '+' instead of '%20')
+  if (normalized.includes('+')) {
+    const [pathPart, ...queryParts] = normalized.split('?');
+    const queryPart = queryParts.join('?');
+    const fixedPath = pathPart.replace(/\+/g, '%20');
+    normalized = queryPart ? `${fixedPath}?${queryPart}` : fixedPath;
+  }
+
+  // 4. Ensure URI path encoding is compliant
+  try {
+    const parsed = new URL(normalized);
+    normalized = encodeURI(decodeURI(parsed.href));
+  } catch {
+    // Keep normalized as-is if URL object parse fails
+  }
+
+  return normalized;
+}
+
 // Sanitize, harmonize and auto-update speaker & category counts
 export function normalizeCatalog(raw: any): AudioCatalog {
   if (!raw || typeof raw !== 'object') {
@@ -43,10 +83,15 @@ export function normalizeCatalog(raw: any): AudioCatalog {
     throw new Error('Catalog audios array is empty');
   }
 
-  // Filter valid audios with minimal required fields
-  const audios: AudioItem[] = rawAudios.filter(
-    (item) => item && typeof item.id === 'string' && typeof item.title === 'string' && typeof item.audioUrl === 'string'
-  );
+  // Filter valid audios with minimal required fields and normalize audio URLs
+  const audios: AudioItem[] = rawAudios
+    .filter(
+      (item) => item && typeof item.id === 'string' && typeof item.title === 'string' && typeof item.audioUrl === 'string'
+    )
+    .map((item) => ({
+      ...item,
+      audioUrl: normalizeAudioUrl(item.audioUrl),
+    }));
 
   const rawCategories: Category[] = Array.isArray(raw.categories) ? raw.categories : CATEGORIES_DATA;
   const rawSpeakers: Speaker[] = Array.isArray(raw.speakers) ? raw.speakers : SPEAKERS_DATA;

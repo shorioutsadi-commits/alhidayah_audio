@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
-import { AudioItem, DownloadedAudio, PlayMode, PlayerSettings, Speaker, Category } from '../types/audio';
+import { AudioItem, DownloadedAudio, PlayMode, PlayerSettings, Speaker, Category, PlaybackDiagnosticLog } from '../types/audio';
 import { StorageService } from '../services/storageService';
-import { CatalogService, AudioCatalog } from '../services/catalogService';
+import { CatalogService, AudioCatalog, normalizeAudioUrl } from '../services/catalogService';
 import { Network } from '@capacitor/network';
 import { App as CapApp } from '@capacitor/app';
 import { ToastMessage, Toast } from '../components/common/Toast';
@@ -35,7 +35,9 @@ interface AudioPlayerContextType {
   settings: PlayerSettings;
   isOnline: boolean;
   toast: ToastMessage | null;
-  
+  lastPlaybackError: PlaybackDiagnosticLog | null;
+  clearPlaybackError: () => void;
+
   // Actions
   playAudio: (audio: AudioItem, newQueue?: AudioItem[]) => Promise<void>;
   togglePlay: () => void;
@@ -80,6 +82,23 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [isOnline, setIsOnline] = useState<boolean>(typeof navigator !== 'undefined' ? navigator.onLine : true);
   const [toast, setToast] = useState<ToastMessage | null>(null);
   const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Playback error diagnostics state
+  const [lastPlaybackError, setLastPlaybackError] = useState<PlaybackDiagnosticLog | null>(() => {
+    try {
+      const saved = localStorage.getItem('al_hidayah_playback_error_log');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const clearPlaybackError = useCallback(() => {
+    setLastPlaybackError(null);
+    try {
+      localStorage.removeItem('al_hidayah_playback_error_log');
+    } catch {}
+  }, []);
   
   const [favorites, setFavorites] = useState<string[]>([]);
   const [downloads, setDownloads] = useState<DownloadedAudio[]>([]);
@@ -88,7 +107,12 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [settings, setSettings] = useState<PlayerSettings>(() => StorageService.getSettings());
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const currentAudioRef = useRef<AudioItem | null>(null);
   const sleepTimerIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    currentAudioRef.current = currentAudio;
+  }, [currentAudio]);
 
   const showToast = useCallback((text: string, type: 'info' | 'success' | 'warning' | 'error' = 'info') => {
     if (toastTimeoutRef.current) {
@@ -97,7 +121,7 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setToast({ id: String(Date.now()), type, text });
     toastTimeoutRef.current = setTimeout(() => {
       setToast(null);
-    }, 3800);
+    }, 4500);
   }, []);
 
   // Centralized catalog refresh method
@@ -248,15 +272,61 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
     const handleError = (e: Event) => {
       console.warn('Audio playback error event:', e);
-      if (audio.src && audio.src.includes('20261020_20261020_0602') && !audio.src.includes('%E0%A6%86%E0%A6%AC%E0%A7%81')) {
-        const subfolder = '%E0%A6%86%E0%A6%AC%E0%A7%81%20%E0%A6%AC%E0%A6%95%E0%A6%B0%20%E0%A6%AE%E0%A7%81%E0%A6%B9%E0%A6%BE%E0%A6%AE%E0%A7%8D%E0%A6%AE%E0%A6%BE%E0%A6%A6%20%E0%A6%AF%E0%A6%BE%E0%A6%95%E0%A6%BE%E0%A6%B0%E0%A6%BF%E0%A7%9F%E0%A6%BE/';
-        audio.src = audio.src.replace('20261020_20261020_0602/', `20261020_20261020_0602/${subfolder}`);
+      const mediaError = audio.error;
+      let errorCode = mediaError ? mediaError.code : undefined;
+      let errorName = 'UNKNOWN_MEDIA_ERROR';
+      let errorDesc = 'অজানা প্লেব্যাক ত্রুটি';
+
+      if (mediaError) {
+        switch (mediaError.code) {
+          case 1:
+            errorName = 'MEDIA_ERR_ABORTED';
+            errorDesc = 'প্লেব্যাক বাতিল করা হয়েছে';
+            break;
+          case 2:
+            errorName = 'MEDIA_ERR_NETWORK';
+            errorDesc = 'নেটওয়ার্ক সমস্যা — অডিও ডাটা লোড করা যায়নি';
+            break;
+          case 3:
+            errorName = 'MEDIA_ERR_DECODE';
+            errorDesc = 'অডিও ডিকোড ত্রুটি — ফরম্যাট অসমর্থিত বা ফাইল ক্ষতিগ্রস্ত';
+            break;
+          case 4:
+            errorName = 'MEDIA_ERR_SRC_NOT_SUPPORTED';
+            errorDesc = 'অডিও ফাইল পাওয়া যায়নি বা লিংক অকার্যকর (HTTP 404 / সার্ভার সংযোগ ব্যর্থ)';
+            break;
+        }
+      }
+
+      // Check if URL can be normalized and retried
+      const normalizedSrc = normalizeAudioUrl(audio.src);
+      if (normalizedSrc && normalizedSrc !== audio.src) {
+        console.info('Retrying playback with sanitized normalized URL:', normalizedSrc);
+        audio.src = normalizedSrc;
         audio.play().then(() => setIsPlaying(true)).catch(() => {
           setIsLoading(false);
           setIsPlaying(false);
         });
         return;
       }
+
+      const log: PlaybackDiagnosticLog = {
+        timestamp: new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+        audioId: currentAudioRef.current?.id || 'unknown',
+        audioTitle: currentAudioRef.current?.title || 'অজানা অডিও',
+        urlAttempted: audio.src,
+        errorCode,
+        errorName,
+        errorMessage: mediaError?.message ? `${errorDesc} (${mediaError.message})` : errorDesc,
+        networkOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
+        isDownloaded: currentAudioRef.current ? StorageService.isDownloaded(currentAudioRef.current.id) : false,
+      };
+
+      setLastPlaybackError(log);
+      try {
+        localStorage.setItem('al_hidayah_playback_error_log', JSON.stringify(log));
+      } catch {}
+
       setIsLoading(false);
       setIsPlaying(false);
     };
@@ -383,7 +453,7 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       }
     }
 
-    // Rule 2 & 3: If not downloaded, check network connectivity
+    // Rule 2 & 3: If not downloaded, check network connectivity and sanitize URL
     if (!srcToPlay) {
       if (!isOnline) {
         setIsLoading(false);
@@ -391,7 +461,7 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
         showToast('ইন্টারনেট সংযোগ নেই — এই অডিওটি শুনতে ইন্টারনেট অথবা ডাউনলোড প্রয়োজন', 'warning');
         return;
       }
-      srcToPlay = audio.audioUrl;
+      srcToPlay = normalizeAudioUrl(audio.audioUrl);
     }
 
     if (audioRef.current) {
@@ -401,12 +471,14 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
         audioRef.current.playbackRate = playbackRate;
         await audioRef.current.play();
         setIsPlaying(true);
-      } catch (err) {
+      } catch (err: any) {
         console.warn('Playback error with source:', err);
-        // Fallback 1: if offline blob was used and failed, try original audioUrl if online
+
+        // Fallback 1: if offline blob was used and failed, try original online URL if online
         if (isLocal && isOnline) {
           try {
-            audioRef.current.src = audio.audioUrl;
+            const fallbackOnlineUrl = normalizeAudioUrl(audio.audioUrl);
+            audioRef.current.src = fallbackOnlineUrl;
             await audioRef.current.play();
             setIsPlaying(true);
             return;
@@ -414,33 +486,52 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
             console.warn('Fallback online stream failed:', eOffline);
           }
         }
-        // Fallback 2: if archive.org nested path is needed
-        if (srcToPlay.includes('20261020_20261020_0602') && !srcToPlay.includes('%E0%A6%86%E0%A6%AC%E0%A7%81')) {
-          const subfolder = '%E0%A6%86%E0%A6%AC%E0%A7%81%20%E0%A6%AC%E0%A6%95%E0%A6%B0%20%E0%A6%AE%E0%A7%81%E0%A6%B9%E0%A6%BE%E0%A6%AE%E0%A7%8D%E0%A6%AE%E0%A6%BE%E0%A6%A6%20%E0%A6%AF%E0%A6%BE%E0%A6%95%E0%A6%BE%E0%A6%B0%E0%A6%BF%E0%A7%9F%E0%A6%BE/';
-          const nestedUrl = srcToPlay.replace('20261020_20261020_0602/', `20261020_20261020_0602/${subfolder}`);
+
+        // Fallback 2: if srcToPlay is different from fully normalized URL
+        const fullyNormalized = normalizeAudioUrl(srcToPlay);
+        if (fullyNormalized !== srcToPlay) {
           try {
-            audioRef.current.src = nestedUrl;
+            audioRef.current.src = fullyNormalized;
             await audioRef.current.play();
             setIsPlaying(true);
             return;
-          } catch (eNested) {
-            console.warn('Archive nested path stream failed:', eNested);
+          } catch (eNorm) {
+            console.warn('Fallback normalized stream failed:', eNorm);
           }
         }
-        // Fallback 3: if archive.org redirect fails, try direct edge mirror
-        if (srcToPlay.includes('archive.org/download/')) {
-          const directMirror = srcToPlay.replace('https://archive.org/download/', 'https://dn710002.ca.archive.org/0/items/');
-          try {
-            audioRef.current.src = directMirror;
-            await audioRef.current.play();
-            setIsPlaying(true);
-            return;
-          } catch (eMirror) {
-            console.warn('Archive mirror failed:', eMirror);
-          }
+
+        // Diagnostics logging
+        const mediaErr = audioRef.current?.error;
+        let errDesc = 'অডিও প্লেব্যাকের সময় ত্রুটি হয়েছে';
+        if (mediaErr?.code === 4) {
+          errDesc = 'অডিও ফাইল পাওয়া যায়নি (HTTP 404 বা সার্ভার সংযোগ ব্যর্থ)';
+        } else if (mediaErr?.code === 2) {
+          errDesc = 'নেটওয়ার্ক সমস্যা — ইন্টারনেট সংযোগ পরীক্ষা করুন';
+        } else if (mediaErr?.code === 3) {
+          errDesc = 'অডিও ফরম্যাট সমর্থিত নয় বা ফাইল ক্ষতিগ্রস্ত';
+        } else if (err?.message) {
+          errDesc = err.message;
         }
+
+        const log: PlaybackDiagnosticLog = {
+          timestamp: new Date().toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+          audioId: audio.id,
+          audioTitle: audio.title,
+          urlAttempted: srcToPlay,
+          errorCode: mediaErr?.code,
+          errorName: err?.name || 'PLAYBACK_ERROR',
+          errorMessage: errDesc,
+          networkOnline: isOnline,
+          isDownloaded: isLocal,
+        };
+
+        setLastPlaybackError(log);
+        try {
+          localStorage.setItem('al_hidayah_playback_error_log', JSON.stringify(log));
+        } catch {}
+
         setIsPlaying(false);
-        showToast('অডিও প্লেব্যাকের সময় ত্রুটি হয়েছে', 'error');
+        showToast(`প্লেব্যাক ত্রুটি: ${errDesc}`, 'error');
       } finally {
         setIsLoading(false);
       }
@@ -571,13 +662,10 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
       // Fetch actual audio binary data
       let blob: Blob | undefined;
-      const downloadUrls: string[] = [audio.audioUrl];
-      if (audio.audioUrl.includes('20261020_20261020_0602') && !audio.audioUrl.includes('%E0%A6%86%E0%A6%AC%E0%A7%81')) {
-        const subfolder = '%E0%A6%86%E0%A6%AC%E0%A7%81%20%E0%A6%AC%E0%A6%95%E0%A6%B0%20%E0%A6%AE%E0%A7%81%E0%A6%B9%E0%A6%BE%E0%A6%AE%E0%A7%8D%E0%A6%AE%E0%A6%BE%E0%A6%A6%20%E0%A6%AF%E0%A6%BE%E0%A6%95%E0%A6%BE%E0%A6%B0%E0%A6%BF%E0%A7%9F%E0%A6%BE/';
-        downloadUrls.push(audio.audioUrl.replace('20261020_20261020_0602/', `20261020_20261020_0602/${subfolder}`));
-      }
-      if (audio.audioUrl.includes('archive.org/download/')) {
-        downloadUrls.push(audio.audioUrl.replace('https://archive.org/download/', 'https://dn710002.ca.archive.org/0/items/'));
+      const normalizedDownloadUrl = normalizeAudioUrl(audio.audioUrl);
+      const downloadUrls: string[] = [normalizedDownloadUrl];
+      if (audio.audioUrl !== normalizedDownloadUrl) {
+        downloadUrls.push(audio.audioUrl);
       }
 
       for (const dUrl of downloadUrls) {
@@ -685,6 +773,8 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
         settings,
         isOnline,
         toast,
+        lastPlaybackError,
+        clearPlaybackError,
         playAudio,
         togglePlay,
         pause,

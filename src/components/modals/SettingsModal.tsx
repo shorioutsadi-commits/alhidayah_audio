@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Settings, Volume2, Car, Bell, Wifi, Trash2, CheckCircle2, RefreshCw, Music } from 'lucide-react';
+import { X, Settings, Volume2, Car, Bell, Wifi, Trash2, CheckCircle2, RefreshCw, Music, AlertTriangle, Copy, Check } from 'lucide-react';
 import { useAudioPlayer } from '../../context/AudioPlayerContext';
 import { toBengaliNumber } from '../../utils/bengaliUtils';
 
@@ -16,9 +16,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     showToast,
     catalog,
     isCatalogLoading,
-    refreshCatalog
+    refreshCatalog,
+    lastPlaybackError,
+    clearPlaybackError
   } = useAudioPlayer();
   const [confirmClear, setConfirmClear] = React.useState(false);
+  const [copiedLog, setCopiedLog] = React.useState(false);
 
   if (!isOpen) return null;
 
@@ -194,6 +197,69 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 <span>{isCatalogLoading ? 'আপডেট খোঁজা হচ্ছে...' : 'নতুন অডিওর আপডেট পরীক্ষা করুন'}</span>
               </button>
             </div>
+          </div>
+
+          {/* Playback Diagnostics & Error Log */}
+          <div className="pt-3 border-t border-stone-100">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold text-stone-800 flex items-center gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5 text-orange-600" />
+                <span>প্লেব্যাক ডায়াগনস্টিক ও ত্রুটি লগ</span>
+              </span>
+              {lastPlaybackError && (
+                <button
+                  onClick={clearPlaybackError}
+                  className="text-[10px] text-stone-500 hover:text-rose-600 underline font-medium cursor-pointer"
+                >
+                  লগ পরিষ্কার করুন
+                </button>
+              )}
+            </div>
+
+            {lastPlaybackError ? (
+              <div className="bg-rose-50/80 border border-rose-200 rounded-2xl p-3 space-y-2 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-rose-800">সর্বশেষ ব্যর্থ প্লেব্যাক:</span>
+                  <span className="text-[10px] text-rose-600 bg-rose-100 px-1.5 py-0.5 rounded-full font-mono">
+                    {lastPlaybackError.timestamp}
+                  </span>
+                </div>
+                <div>
+                  <p className="font-semibold text-stone-800 truncate">{lastPlaybackError.audioTitle}</p>
+                  <p className="text-[11px] text-rose-700 mt-0.5 leading-snug font-medium">
+                    {lastPlaybackError.errorMessage}
+                  </p>
+                </div>
+                <div className="bg-white/80 p-2 rounded-lg border border-rose-150 text-[10px] text-stone-600 font-mono break-all line-clamp-2 select-all">
+                  {lastPlaybackError.urlAttempted}
+                </div>
+                <div className="flex items-center justify-between pt-1">
+                  <span className="text-[10px] text-stone-500">
+                    কোড: {lastPlaybackError.errorCode || 'N/A'} • নেট: {lastPlaybackError.networkOnline ? 'সচল' : 'বন্ধ'}
+                  </span>
+                  <button
+                    onClick={() => {
+                      const text = JSON.stringify(lastPlaybackError, null, 2);
+                      navigator.clipboard.writeText(text);
+                      setCopiedLog(true);
+                      showToast('ত্রুটি লগ ক্লিপবোর্ডে কপি করা হয়েছে', 'success');
+                      setTimeout(() => setCopiedLog(false), 2000);
+                    }}
+                    className="flex items-center gap-1 px-2.5 py-1 bg-white hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-[10px] font-bold transition-colors cursor-pointer"
+                  >
+                    {copiedLog ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                    <span>{copiedLog ? 'কপি হয়েছে' : 'লগ কপি করুন'}</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-3 flex items-center gap-2 text-xs text-emerald-800">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span className="text-[11px] font-medium leading-tight">
+                  কোনো প্লেব্যাক ত্রুটি নেই (সব অডিও স্বাভাবিকভাবে চলছে)
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Clear Storage */}
