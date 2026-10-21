@@ -24,8 +24,8 @@ const CATALOG_META_KEY = 'al_hidayah_catalog_meta_v1';
 
 // Initial bundled fallback catalog ensuring 100% offline reliability
 export const INITIAL_FALLBACK_CATALOG: AudioCatalog = {
-  version: '1.1.0',
-  lastUpdated: '2026-10-20T08:00:00.000Z',
+  version: '1.1.1',
+  lastUpdated: '2026-10-21T06:00:00.000Z',
   totalAudios: AUDIOS_DATA.length,
   categories: CATEGORIES_DATA,
   speakers: SPEAKERS_DATA,
@@ -37,20 +37,37 @@ export function normalizeAudioUrl(url: string): string {
   if (!url || typeof url !== 'string') return url;
   let normalized = url.trim();
 
-  // 1. If it is an Archive.org details page URL (/details/), convert to direct download URL (/download/)
+  // 1. Convert Archive.org /details/ URLs to direct stream /download/
   if (normalized.includes('archive.org/details/')) {
     normalized = normalized.replace('archive.org/details/', 'archive.org/download/');
   }
 
-  // 2. Internet Archive subfolder repair for item 20261020_20261020_0602
-  // Files in this archive item are stored inside the scholar subdirectory
-  if (
-    normalized.includes('20261020_20261020_0602') &&
-    !normalized.includes('%E0%A6%86%E0%A6%AC%E0%A7%81') &&
-    !normalized.includes('আবু')
-  ) {
-    const subfolder = '%E0%A6%86%E0%A6%AC%E0%A7%81%20%E0%A6%AC%E0%A6%95%E0%A6%B0%20%E0%A6%AE%E0%A7%81%E0%A6%B9%E0%A6%BE%E0%A6%AE%E0%A7%8D%E0%A6%AE%E0%A6%BE%E0%A6%A6%20%E0%A6%AF%E0%A6%BE%E0%A6%95%E0%A6%BE%E0%A6%B0%E0%A6%BF%E0%A7%9F%E0%A6%BE/';
-    normalized = normalized.replace('20261020_20261020_0602/', `20261020_20261020_0602/${subfolder}`);
+  // 2. Exact scholar subfolder and ZWNJ for Internet Archive item 20261020_20261020_0602
+  const exactSubfolder = '%E0%A6%86%E0%A6%AC%E0%A7%81%20%E0%A6%AC%E0%A6%95%E0%A6%B0%20%E0%A6%AE%E0%A7%81%E0%A6%B9%E0%A6%BE%E0%A6%AE%E0%A7%8D%E0%A6%AE%E0%A6%BE%E0%A6%A6%20%E0%A6%AF%E0%A6%BE%E0%A6%95%E0%A6%BE%E0%A6%B0%E0%A6%BF%E0%A7%9F%E0%A6%BE/';
+
+  if (normalized.includes('20261020_20261020_0602/')) {
+    // If it has misspelled or unencoded subfolder variation with "মুহাম্মদ", normalize it to exact folder "মুহাম্মাদ"
+    const wrongSpellingSubfolder = '%E0%A6%86%E0%A6%AC%E0%A7%81%20%E0%A6%AC%E0%A6%95%E0%A6%B0%20%E0%A6%AE%E0%A7%81%E0%A6%B9%E0%A6%BE%E0%A6%AE%E0%A7%8D%E0%A6%AE%E0%A6%A6%20%E0%A6%AF%E0%A6%BE%E0%A6%95%E0%A6%BE%E0%A6%B0%E0%A6%BF%E0%A7%9F%E0%A6%BE/';
+    if (normalized.includes('20261020_20261020_0602/' + wrongSpellingSubfolder)) {
+      normalized = normalized.replace(
+        '20261020_20261020_0602/' + wrongSpellingSubfolder,
+        '20261020_20261020_0602/' + exactSubfolder
+      );
+    } else if (
+      !normalized.includes('20261020_20261020_0602/' + exactSubfolder) &&
+      !normalized.includes('20261020_20261020_0602/%E0%A6%86%E0%A6%AC') &&
+      !normalized.includes('20261020_20261020_0602/আবু')
+    ) {
+      // Subfolder is completely missing: insert it
+      normalized = normalized.replace('20261020_20261020_0602/', `20261020_20261020_0602/${exactSubfolder}`);
+    }
+
+    // Fix Bengali ZWNJ (\u200c / %E2%80%8C) in "ব্যাখ‌্যা" if missing from remote catalog
+    const withoutZWNJ = '%E0%A6%AC%E0%A7%8D%E0%A6%AF%E0%A6%BE%E0%A6%96%E0%A7%8D%E0%A6%AF%E0%A6%BE';
+    const withZWNJ = '%E0%A6%AC%E0%A7%8D%E0%A6%AF%E0%A6%BE%E0%A6%96%E2%80%8C%E0%A7%8D%E0%A6%AF%E0%A6%BE';
+    if (normalized.includes(withoutZWNJ)) {
+      normalized = normalized.split(withoutZWNJ).join(withZWNJ);
+    }
   }
 
   // 3. Fix '+' to '%20' for spaces in URL path (Archive.org 404s when paths have '+' instead of '%20')
@@ -59,14 +76,6 @@ export function normalizeAudioUrl(url: string): string {
     const queryPart = queryParts.join('?');
     const fixedPath = pathPart.replace(/\+/g, '%20');
     normalized = queryPart ? `${fixedPath}?${queryPart}` : fixedPath;
-  }
-
-  // 4. Ensure URI path encoding is compliant
-  try {
-    const parsed = new URL(normalized);
-    normalized = encodeURI(decodeURI(parsed.href));
-  } catch {
-    // Keep normalized as-is if URL object parse fails
   }
 
   return normalized;

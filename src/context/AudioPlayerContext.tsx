@@ -303,6 +303,7 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       if (normalizedSrc && normalizedSrc !== audio.src) {
         console.info('Retrying playback with sanitized normalized URL:', normalizedSrc);
         audio.src = normalizedSrc;
+        audio.load();
         audio.play().then(() => setIsPlaying(true)).catch(() => {
           setIsLoading(false);
           setIsPlaying(false);
@@ -468,6 +469,7 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
       try {
         audioRef.current.pause();
         audioRef.current.src = srcToPlay;
+        audioRef.current.load();
         audioRef.current.playbackRate = playbackRate;
         await audioRef.current.play();
         setIsPlaying(true);
@@ -479,6 +481,7 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
           try {
             const fallbackOnlineUrl = normalizeAudioUrl(audio.audioUrl);
             audioRef.current.src = fallbackOnlineUrl;
+            audioRef.current.load();
             await audioRef.current.play();
             setIsPlaying(true);
             return;
@@ -492,6 +495,7 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
         if (fullyNormalized !== srcToPlay) {
           try {
             audioRef.current.src = fullyNormalized;
+            audioRef.current.load();
             await audioRef.current.play();
             setIsPlaying(true);
             return;
