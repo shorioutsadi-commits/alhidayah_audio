@@ -24,8 +24,8 @@ const CATALOG_META_KEY = 'al_hidayah_catalog_meta_v1';
 
 // Initial bundled fallback catalog ensuring 100% offline reliability
 export const INITIAL_FALLBACK_CATALOG: AudioCatalog = {
-  version: '1.1.1',
-  lastUpdated: '2026-10-21T06:00:00.000Z',
+  version: '1.2.0',
+  lastUpdated: '2026-10-21T18:45:00.000Z',
   totalAudios: AUDIOS_DATA.length,
   categories: CATEGORIES_DATA,
   speakers: SPEAKERS_DATA,
@@ -76,6 +76,13 @@ export function normalizeAudioUrl(url: string): string {
     const queryPart = queryParts.join('?');
     const fixedPath = pathPart.replace(/\+/g, '%20');
     normalized = queryPart ? `${fixedPath}?${queryPart}` : fixedPath;
+  }
+
+  // 4. Resolve Shaykh Motiur Rahman Madani Quraner Surar Fozilat direct MP3
+  if (normalized.includes('bangla-tafseer-000-quraner-surar-fozilat-by-motiur-rahman-madani')) {
+    if (!normalized.endsWith('.mp3')) {
+      normalized = 'https://archive.org/download/bangla-tafseer-000-quraner-surar-fozilat-by-motiur-rahman-madani/Bangla%20Tafseer%20000%20Quraner%20Surar%20Fozilat%20by%20Motiur%20Rahman%20Madani.mp3';
+    }
   }
 
   return normalized;

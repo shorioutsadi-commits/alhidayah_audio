@@ -1,14 +1,14 @@
 {
-  "version": "1.1.1",
-  "lastUpdated": "2026-10-20T12:45:00.000Z",
-  "totalAudios": 23,
+  "version": "1.2.0",
+  "lastUpdated": "2026-10-21T18:47:38.080Z",
+  "totalAudios": 21,
   "categories": [
     {
       "id": "cat-1",
       "name": "ঈমান ও আকীদা",
       "iconName": "ShieldCheck",
       "description": "সহীহ আকিদা, তাওহীদ ও ঈমান মজবুত করার মূলনীতি",
-      "audioCount": 8,
+      "audioCount": 7,
       "color": "from-amber-500 to-orange-600"
     },
     {
@@ -84,7 +84,7 @@
       "title": "মুহাদ্দিস ও বিশিষ্ট ইসলামিক দাঈ (জুবাইল, কেএসএ)",
       "image": "./speakers/speaker_2_motiur_rahman_madani.jpg",
       "bio": "মদিনা ইসলামিক বিশ্ববিদ্যালয় থেকে উচ্চশিক্ষা সম্পন্নকারী। সহীহ সুন্নাহ প্রচার ও বেদআত বর্জনে তিন দশকেরও বেশি সময় ধরে নিবেদিত।",
-      "totalAudios": 3,
+      "totalAudios": 1,
       "category": "সহীহ হাদিস ও সুন্নাহ"
     },
     {
@@ -488,33 +488,19 @@
     },
     {
       "id": "aud-mrm-1",
-      "title": "সহীহ সুন্নাহ অনুযায়ী সালাত আদায় ও সাধারণ ভুলত্রুটি",
+      "title": "বাংলা তাফসীর — কুরআনের সূরার ফযিলত",
       "speakerId": "spk-motiur-rahman-madani",
       "speakerName": "শাইখ মতিউর রাহমান মাদানি",
       "speakerImage": "./speakers/speaker_2_motiur_rahman_madani.jpg",
-      "category": "সহীহ হাদিস ও সুন্নাহ",
-      "description": "রাসুলুল্লাহ (সা:) যেভাবে নামায পড়েছেন—দলীলভিত্তিক সালাতের বর্ণনা ও খুশু অর্জনের উপায়।",
-      "duration": 1280,
-      "audioUrl": "https://download.quranicaudio.com/quran/mishaari_raashid_al_3afaasee/055.mp3",
-      "fileSizeMb": 17.5,
-      "playCount": 45100,
-      "publishDate": "২৮ সেপ্টেম্বর, ২০২৬",
+      "category": "কুরআন তিলাওয়াত ও অর্থ",
+      "description": "শাইখ মতিউর রাহমান মাদানি কর্তৃক পবিত্র কুরআনের বিভিন্ন সূরার গুরুত্ব, তাৎপর্য ও ফযিলত সম্পর্কিত বিশদ তাফসীর ও আলোচনা।",
+      "duration": 3344,
+      "audioUrl": "https://archive.org/download/bangla-tafseer-000-quraner-surar-fozilat-by-motiur-rahman-madani/Bangla%20Tafseer%20000%20Quraner%20Surar%20Fozilat%20by%20Motiur%20Rahman%20Madani.mp3",
+      "fileSizeMb": 24.9,
+      "playCount": 52400,
+      "publishDate": "২০ অক্টোবর, ২০২৬",
       "isFeatured": true,
-      "seriesName": "সহীহ সালাত শিক্ষা"
-    },
-    {
-      "id": "aud-mrm-2",
-      "title": "বিদআত চেনার সহজ উপায় ও এর ধ্বংসাত্মক পরিণতি",
-      "speakerId": "spk-motiur-rahman-madani",
-      "speakerName": "শাইখ মতিউর রাহমান মাদানি",
-      "speakerImage": "./speakers/speaker_2_motiur_rahman_madani.jpg",
-      "category": "ঈমান ও আকীদা",
-      "description": "ইবাদতে নতুন বিষয় আবিষ্কারের ক্ষতি এবং সুন্নাহ অনুযায়ী জীবন গঠনের গুরুত্ব।",
-      "duration": 1050,
-      "audioUrl": "https://download.quranicaudio.com/quran/mishaari_raashid_al_3afaasee/001.mp3",
-      "fileSizeMb": 14.1,
-      "playCount": 31000,
-      "publishDate": "১৫ সেপ্টেম্বর, ২০২৬"
+      "seriesName": "বাংলা তাফসীর সিরিজ"
     },
     {
       "id": "aud-arby-1",
@@ -734,20 +720,6 @@
       "playCount": 29800,
       "publishDate": "০৯ সেপ্টেম্বর, ২০২৬",
       "isFeatured": true
-    },
-    {
-      "id": "aud-quran-3",
-      "title": "সূরা আল-কাহাফ ও জুমার দিনের বিশেষ সুন্নাতসমূহ",
-      "speakerId": "spk-motiur-rahman-madani",
-      "speakerName": "শাইখ মতিউর রাহমান মাদানি",
-      "speakerImage": "./speakers/speaker_2_motiur_rahman_madani.jpg",
-      "category": "কুরআন তিলাওয়াত ও অর্থ",
-      "description": "জুমার দিনে সূরা আল-কাহাফ তিলাওয়াতের গুরুত্ব ও দাজ্জালের ফিতনা থেকে রক্ষা পাওয়ার উপায়।",
-      "duration": 1240,
-      "audioUrl": "https://download.quranicaudio.com/quran/mishaari_raashid_al_3afaasee/018.mp3",
-      "fileSizeMb": 16.5,
-      "playCount": 41200,
-      "publishDate": "০৫ সেপ্টেম্বর, ২০২৬"
     },
     {
       "id": "aud-seerah-1",
