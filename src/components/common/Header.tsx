@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Search, Download, Smartphone } from 'lucide-react';
+import { Menu, Search, Download } from 'lucide-react';
 import { Logo } from './Logo';
 import { toBengaliNumber } from '../../utils/bengaliUtils';
 import { useAudioPlayer } from '../../context/AudioPlayerContext';
@@ -7,14 +7,13 @@ import { useAudioPlayer } from '../../context/AudioPlayerContext';
 interface HeaderProps {
   onOpenDrawer: () => void;
   onOpenSearch: () => void;
-  onOpenInstallModal: () => void;
+  onOpenInstallModal?: () => void;
   onOpenDownloadsTab: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onOpenDrawer,
   onOpenSearch,
-  onOpenInstallModal,
   onOpenDownloadsTab
 }) => {
   const { downloads } = useAudioPlayer();
@@ -71,17 +70,6 @@ export const Header: React.FC<HeaderProps> = ({
                 {toBengaliNumber(downloads.length)}
               </span>
             )}
-          </button>
-
-          {/* APK / Install App Button */}
-          <button
-            onClick={onOpenInstallModal}
-            aria-label="অ্যান্ড্রয়েড অ্যাপ ইনস্টল"
-            className="flex items-center gap-1 px-2.5 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-xl text-xs font-semibold backdrop-blur-sm active:scale-95 transition-all ml-1 border border-white/25"
-            title="এপিকে ও ইনস্টলেশন"
-          >
-            <Smartphone className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">অ্যাপ</span>
           </button>
         </div>
 

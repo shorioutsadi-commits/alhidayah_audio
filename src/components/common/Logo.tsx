@@ -36,7 +36,7 @@ export const Logo: React.FC<LogoProps> = ({
             : 'bg-gradient-to-br from-orange-500 via-orange-600 to-amber-600 text-white shadow-orange-500/25 shadow-lg'
         }`}
       >
-        {/* Islamic Audio Logo Icon: Crescent + Minaret/Audio Soundwave Waves + Play Triangle */}
+        {/* Audio Soundwave Equalizer Logo with 7 rounded vertical pill bars */}
         <svg 
           width={dimension * 0.72} 
           height={dimension * 0.72} 
@@ -44,34 +44,20 @@ export const Logo: React.FC<LogoProps> = ({
           fill="none" 
           xmlns="http://www.w3.org/2000/svg"
         >
-          {/* Islamic Crescent geometry */}
-          <path 
-            d="M34 22 C56 22 72 35 72 50 C72 65 56 78 34 78 C42 67 46 56 46 50 C46 44 42 33 34 22 Z" 
-            fill="currentColor" 
-          />
-          {/* Star/Audio dot */}
-          <circle cx="64" cy="36" r="5" fill="currentColor" />
-          {/* Audio sound waves / Minaret arch */}
-          <path 
-            d="M26 68 L26 32 C26 29 29 27 32 29 L60 47 C63 49 63 53 60 55 L32 73 C29 75 26 73 26 70 Z" 
-            fill="currentColor" 
-            opacity="0.9" 
-          />
-          {/* Sound wave rings */}
-          <path 
-            d="M74 38 C79 42 82 46 82 50 C82 54 79 58 74 62" 
-            stroke="currentColor" 
-            strokeWidth="4" 
-            strokeLinecap="round" 
-            opacity="0.8" 
-          />
-          <path 
-            d="M82 30 C89 36 92 43 92 50 C92 57 89 64 82 70" 
-            stroke="currentColor" 
-            strokeWidth="3.5" 
-            strokeLinecap="round" 
-            opacity="0.6" 
-          />
+          {/* Bar 1 */}
+          <rect x="11" y="37" width="8" height="26" rx="4" fill="currentColor" />
+          {/* Bar 2 */}
+          <rect x="23" y="31" width="8" height="38" rx="4" fill="currentColor" />
+          {/* Bar 3 */}
+          <rect x="35" y="21" width="8" height="58" rx="4" fill="currentColor" />
+          {/* Bar 4 (Center - Tallest) */}
+          <rect x="46" y="8" width="8" height="84" rx="4" fill="currentColor" />
+          {/* Bar 5 */}
+          <rect x="58" y="21" width="8" height="58" rx="4" fill="currentColor" />
+          {/* Bar 6 */}
+          <rect x="70" y="31" width="8" height="38" rx="4" fill="currentColor" />
+          {/* Bar 7 */}
+          <rect x="81" y="37" width="8" height="26" rx="4" fill="currentColor" />
         </svg>
       </div>
 

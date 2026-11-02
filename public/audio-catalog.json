@@ -1,6 +1,6 @@
 {
-  "version": "1.2.0",
-  "lastUpdated": "2026-10-21T18:47:38.095Z",
+  "version": "1.2.15",
+  "lastUpdated": "2026-11-02T15:10:04.095Z",
   "totalAudios": 21,
   "categories": [
     {
@@ -136,7 +136,7 @@
       "id": "spk-saifuddin-bilal-madani",
       "name": "শাইখ সাইফুদ্দিন বিলাল মাদানি",
       "title": "ইসলামিক চিন্তাবিদ ও খতীব",
-      "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=400",
+      "image": "./speakers/speaker_8_saifuddin_bilal_madani.png",
       "bio": "মদিনা বিশ্ববিদ্যালয় থেকে শিক্ষা সমাপনকারী। খুতবা ও দরসের মাধ্যমে সহীহ সুন্নাহর দাওয়াত প্রচারক।",
       "totalAudios": 41,
       "category": "জুমার খুতবা ও বয়ান"
@@ -145,7 +145,7 @@
       "id": "spk-abdullah-shahed-madani",
       "name": "শাইখ আব্দুল্লাহ শাহেদ আল মাদানি",
       "title": "ইসলামিক আলোচক ও শিক্ষাবিদ",
-      "image": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400",
+      "image": "./speakers/speaker_9_abdullah_shahed_madani.jpg",
       "bio": "পবিত্র কুরআন ও হাদিসের আলোকে যুবসমাজের চরিত্র গঠন ও জীবনোপযোগী আলোচনা করে থাকেন।",
       "totalAudios": 33,
       "category": "নৈতিকতা ও চরিত্র"
@@ -154,7 +154,7 @@
       "id": "spk-abdur-razzaq-bin-yousuf",
       "name": "শাইখ আব্দুর রাজ্জাক বিন ইউসুফ",
       "title": "প্রতিষ্ঠাতা, আল-জামিআহ আস-সালাফিয়্যাহ, রাজশাহী",
-      "image": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=400",
+      "image": "./speakers/speaker_10_abdur_razzaq_bin_yousuf.jpg",
       "bio": "হৃদয়কাঁপানো জোরালো বক্তব্য ও সহীহ সুন্নাহ বাস্তবায়নের আহ্বানে দেশের সর্বত্র বিপুল জনপ্রিয় ইসলামিক বক্তা।",
       "totalAudios": 2,
       "category": "আমল ও নসীহত"
@@ -163,7 +163,7 @@
       "id": "spk-muzaffar-bin-mohsin",
       "name": "ড. মোজাফফর বিন মহসিন",
       "title": "ইসলামিক গবেষক, শিক্ষক ও গ্রন্থকার",
-      "image": "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=400",
+      "image": "./speakers/speaker_11_muzaffar_bin_mohsin.jpg",
       "bio": "জাল হাদিসের বিরুদ্ধে গবেষণা ও সহীহ সুন্নাহভিত্তিক সালাতের সঠিক নিয়ম বর্ণনায় অনন্য অবদান রেখেছেন।",
       "totalAudios": 1,
       "category": "জাল হাদিস ও সহীহ সুন্নাহ"
@@ -172,7 +172,7 @@
       "id": "spk-abdullah-faruq",
       "name": "অধ্যাপক ড. আব্দুল্লাহ ফারুক",
       "title": "শিক্ষাবিদ, গবেষক ও ইসলামিক চিন্তাবিদ",
-      "image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=400",
+      "image": "./speakers/speaker_12_abdullah_faruq.jpg",
       "bio": "আধুনিক জ্ঞান-বিজ্ঞান ও ইসলামী শিক্ষার সমন্বয়ে গবেষণাধর্মী আলোচনার জন্য সমাদৃত ব্যক্তিত্ব।",
       "totalAudios": 1,
       "category": "ইসলাম ও সমকালীন সমাজ"
@@ -181,7 +181,7 @@
       "id": "spk-akramuzzaman-bin-abdus-salam",
       "name": "শাইখ আকরামুজ্জামান বিন আবদুস সালাম",
       "title": "বিশিষ্ট দাঈ ও ইসলামিক আলোচক",
-      "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400",
+      "image": "./speakers/speaker_13_akramuzzaman_bin_abdus_salam.jpg",
       "bio": "শুদ্ধ উচ্চারণে দলীলভিত্তিক বক্তব্য প্রদানকারী অন্যতম সুবক্তা ও ইসলামিক গবেষক।",
       "totalAudios": 1,
       "category": "আকীদা ও আমল"
@@ -190,7 +190,7 @@
       "id": "spk-imam-hossain",
       "name": "শাইখ ড. ইমাম হুসাইন",
       "title": "গবেষক, শিক্ষাবিদ ও ইসলামিক স্কলার",
-      "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=400",
+      "image": "./speakers/speaker_14_imam_hossain.png",
       "bio": "ইসলামী অনুশাসন ও সামাজিক উন্নয়নে প্রাজ্ঞ বিশ্লেষণের অধিকারী গবেষক আলেম।",
       "totalAudios": 28,
       "category": "সমাজ সংস্কার"
@@ -199,7 +199,7 @@
       "id": "spk-ahmadullah-salafi",
       "name": "শাইখ আহমাদুল্লাহ সালাফি",
       "title": "মুহাদ্দিস ও বিশিষ্ট দাঈ",
-      "image": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400",
+      "image": "./speakers/speaker_15_ahmadullah_salafi.jpeg",
       "bio": "সহীহ হাদিসের প্রামাণিক ব্যাখ্যা এবং সালাফদের আদর্শ অনুযায়ী জীবন পরিচালনার দিকনির্দেশক।",
       "totalAudios": 35,
       "category": "হাদিস পাঠ ও ব্যাখ্যা"
@@ -208,7 +208,7 @@
       "id": "spk-abdus-samad-salafi",
       "name": "শাইখ আবদুস সামাদ সালাফী",
       "title": "শিক্ষক, গ্রন্থকার ও স্কলার",
-      "image": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=400",
+      "image": "./speakers/speaker_16_abdus_samad_salafi.jpg",
       "bio": "ইসলামী শিক্ষার প্রচার ও গবেষণায় নিবেদিত অভিজ্ঞ ইসলামিক শিক্ষাবিদ।",
       "totalAudios": 27,
       "category": "তাওহীদ ও সুন্নাহ"
@@ -217,7 +217,7 @@
       "id": "spk-amanullah-bin-ismail",
       "name": "শাইখ আমানুল্লাহ বিন ইসমাইল",
       "title": "বিশিষ্ট দাঈ ও আলোচক",
-      "image": "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=400",
+      "image": "./speakers/speaker_17_amanullah_bin_ismail.jpg",
       "bio": "মানুষের মাঝে ধর্মীয় মূল্যবোধ ও পরকালমুখিতা জাগাতে নিয়মিত আলোচনা করে থাকেন।",
       "totalAudios": 30,
       "category": "পরকাল ও আত্মশুদ্ধি"
@@ -507,7 +507,7 @@
       "title": "আদর্শ পরিবার গঠনে পিতা-মাতা ও সন্তানের করণীয়",
       "speakerId": "spk-abdur-razzaq-bin-yousuf",
       "speakerName": "শাইখ আব্দুর রাজ্জাক বিন ইউসুফ",
-      "speakerImage": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=400",
+      "speakerImage": "./speakers/speaker_10_abdur_razzaq_bin_yousuf.jpg",
       "category": "পরিবার ও সমাজ সংস্কার",
       "description": "পরিবারে ইসলামী অনুশাসন কায়েম, সন্তানদের দ্বীনি তরবিয়ত ও পিতামাতার হক আদায়ের জোরালো নসীহত।",
       "duration": 1420,
@@ -523,7 +523,7 @@
       "title": "কবরের কঠিন আযাব ও জাহান্নাম থেকে মুক্তির পথ",
       "speakerId": "spk-abdur-razzaq-bin-yousuf",
       "speakerName": "শাইখ আব্দুর রাজ্জাক বিন ইউসুফ",
-      "speakerImage": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=400",
+      "speakerImage": "./speakers/speaker_10_abdur_razzaq_bin_yousuf.jpg",
       "category": "তাওবা ও আত্মশুদ্ধি",
       "description": "মৃত্যুর পরবর্তী জীবনের বিভীষিকা ও ক্ষমা পাওয়ার প্রকৃত আমল নিয়ে হৃদয়গ্রাহী বক্তৃতা।",
       "duration": 1150,
@@ -609,7 +609,7 @@
       "title": "প্রচলিত জাল ও যয়ীফ হাদিসের স্বরূপ উন্মোচন",
       "speakerId": "spk-muzaffar-bin-mohsin",
       "speakerName": "ড. মোজাফফর বিন মহসিন",
-      "speakerImage": "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=400",
+      "speakerImage": "./speakers/speaker_11_muzaffar_bin_mohsin.jpg",
       "category": "সহীহ হাদিস ও সুন্নাহ",
       "description": "আমাদের সমাজে প্রচলিত ভিত্তিহীন কিচ্ছা-কাহিনী বর্জন ও সহীহ হাদিস গ্রহণের আহ্বান।",
       "duration": 1110,
@@ -667,7 +667,7 @@
       "title": "মুমিনের জীবনের চূড়ান্ত লক্ষ্য জান্নাত অর্জন",
       "speakerId": "spk-akramuzzaman-bin-abdus-salam",
       "speakerName": "শাইখ আকরামুজ্জামান বিন আবদুস সালাম",
-      "speakerImage": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400",
+      "speakerImage": "./speakers/speaker_13_akramuzzaman_bin_abdus_salam.jpg",
       "category": "ঈমান ও আকীদা",
       "description": "জান্নাতের অতুলনীয় নিয়ামত ও জান্নাতীদের দৈনন্দিন গুণাবলী।",
       "duration": 1020,
@@ -726,7 +726,7 @@
       "title": "রাসূলুল্লাহ (সা:)-এর ক্ষমা ও মহানুভবতার অনন্য দৃষ্টান্ত",
       "speakerId": "spk-abdullah-faruq",
       "speakerName": "অধ্যাপক ড. আব্দুল্লাহ ফারুক",
-      "speakerImage": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=400",
+      "speakerImage": "./speakers/speaker_12_abdullah_faruq.jpg",
       "category": "সীরাতুন্নবী (সা:) ও সাহাবা",
       "description": "মক্কা বিজয়ের দিনে রাসুলুল্লাহর অনুপম চরিত্র ও আমাদের ব্যক্তিগত জীবনে ক্ষমার অনুশীলন।",
       "duration": 940,

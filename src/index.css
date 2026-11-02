@@ -1,5 +1,30 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary-50: #fff8eb;
+  --color-primary-100: #feefc7;
+  --color-primary-200: #fddb8a;
+  --color-primary-300: #fcc14d;
+  --color-primary-400: #fba720;
+  --color-primary-500: #f58c01;
+  --color-primary-600: #e07500;
+  --color-primary-700: #b85702;
+  --color-primary-800: #934308;
+  --color-primary-900: #78380b;
+
+  --color-orange-50: #fff8eb;
+  --color-orange-100: #feefc7;
+  --color-orange-200: #fddb8a;
+  --color-orange-300: #fcc14d;
+  --color-orange-400: #fba720;
+  --color-orange-500: #f58c01;
+  --color-orange-600: #f58c01;
+  --color-orange-700: #db7600;
+  --color-orange-800: #b35900;
+  --color-orange-900: #8c4200;
+  --color-orange-950: #4a2100;
+}
+
 @layer base {
   :root {
     --safe-area-top: 0px;
@@ -48,7 +73,7 @@ input[type="range"]::-webkit-slider-thumb {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #ea580c;
+  background: #f58c01;
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
   transition: transform 0.1s ease;

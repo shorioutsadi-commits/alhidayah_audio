@@ -24,8 +24,8 @@ const CATALOG_META_KEY = 'al_hidayah_catalog_meta_v1';
 
 // Initial bundled fallback catalog ensuring 100% offline reliability
 export const INITIAL_FALLBACK_CATALOG: AudioCatalog = {
-  version: '1.2.0',
-  lastUpdated: '2026-10-21T18:45:00.000Z',
+  version: '1.2.15',
+  lastUpdated: '2026-11-02T15:08:00.000Z',
   totalAudios: AUDIOS_DATA.length,
   categories: CATEGORIES_DATA,
   speakers: SPEAKERS_DATA,
@@ -88,6 +88,27 @@ export function normalizeAudioUrl(url: string): string {
   return normalized;
 }
 
+// Verified local portraits for prominent scholars to protect against outdated remote placeholder URLs
+export const KNOWN_SPEAKER_IMAGES: Record<string, string> = {
+  'spk-abu-bakar-zakaria': './speakers/speaker_1_abu_bakar_zakaria.jpg',
+  'spk-motiur-rahman-madani': './speakers/speaker_2_motiur_rahman_madani.jpg',
+  'spk-abdul-hamid-faizi': './speakers/speaker_3_abdul_hamid_faizi.png',
+  'spk-manzoor-e-elahi': './speakers/speaker_4_manzoor_e_elahi.png',
+  'spk-saifullah-madani': './speakers/speaker_5_saifullah_madani.png',
+  'spk-shahidullah-khan-madani': './speakers/speaker_6_shahidullah_khan.jpg',
+  'spk-mustafizur-rahman-madani': './speakers/speaker_7_mostafizur_rahman.jpg',
+  'spk-saifuddin-bilal-madani': './speakers/speaker_8_saifuddin_bilal_madani.png',
+  'spk-abdullah-shahed-madani': './speakers/speaker_9_abdullah_shahed_madani.jpg',
+  'spk-abdur-razzaq-bin-yousuf': './speakers/speaker_10_abdur_razzaq_bin_yousuf.jpg',
+  'spk-muzaffar-bin-mohsin': './speakers/speaker_11_muzaffar_bin_mohsin.jpg',
+  'spk-abdullah-faruq': './speakers/speaker_12_abdullah_faruq.jpg',
+  'spk-akramuzzaman-bin-abdus-salam': './speakers/speaker_13_akramuzzaman_bin_abdus_salam.jpg',
+  'spk-imam-hossain': './speakers/speaker_14_imam_hossain.png',
+  'spk-ahmadullah-salafi': './speakers/speaker_15_ahmadullah_salafi.jpeg',
+  'spk-abdus-samad-salafi': './speakers/speaker_16_abdus_samad_salafi.jpg',
+  'spk-amanullah-bin-ismail': './speakers/speaker_17_amanullah_bin_ismail.jpg',
+};
+
 // Sanitize, harmonize and auto-update speaker & category counts
 export function normalizeCatalog(raw: any): AudioCatalog {
   if (!raw || typeof raw !== 'object') {
@@ -99,26 +120,80 @@ export function normalizeCatalog(raw: any): AudioCatalog {
     throw new Error('Catalog audios array is empty');
   }
 
-  // Filter valid audios with minimal required fields and normalize audio URLs
+  // Filter valid audios with minimal required fields and normalize audio URLs and speaker images
   const audios: AudioItem[] = rawAudios
     .filter(
       (item) => item && typeof item.id === 'string' && typeof item.title === 'string' && typeof item.audioUrl === 'string'
     )
-    .map((item) => ({
-      ...item,
-      audioUrl: normalizeAudioUrl(item.audioUrl),
-    }));
+    .map((item) => {
+      let spkImg = item.speakerImage;
+      if (item.speakerId && KNOWN_SPEAKER_IMAGES[item.speakerId]) {
+        spkImg = KNOWN_SPEAKER_IMAGES[item.speakerId];
+      } else if (item.speakerName && item.speakerName.includes('সাইফুদ্দিন বিলাল')) {
+        spkImg = KNOWN_SPEAKER_IMAGES['spk-saifuddin-bilal-madani'];
+      } else if (item.speakerName && item.speakerName.includes('আব্দুল্লাহ শাহেদ')) {
+        spkImg = KNOWN_SPEAKER_IMAGES['spk-abdullah-shahed-madani'];
+      } else if (item.speakerName && item.speakerName.includes('আব্দুর রাজ্জাক')) {
+        spkImg = KNOWN_SPEAKER_IMAGES['spk-abdur-razzaq-bin-yousuf'];
+      } else if (item.speakerName && (item.speakerName.includes('মোজাফফর') || item.speakerName.includes('মুজাফফর'))) {
+        spkImg = KNOWN_SPEAKER_IMAGES['spk-muzaffar-bin-mohsin'];
+      } else if (item.speakerName && item.speakerName.includes('আব্দুল্লাহ ফারুক')) {
+        spkImg = KNOWN_SPEAKER_IMAGES['spk-abdullah-faruq'];
+      } else if (item.speakerName && (item.speakerName.includes('আকরামুজ্জামান') || item.speakerName.includes('আকরামুজ্জাম্মান'))) {
+        spkImg = KNOWN_SPEAKER_IMAGES['spk-akramuzzaman-bin-abdus-salam'];
+      } else if (item.speakerName && item.speakerName.includes('ইমাম হুসাইন')) {
+        spkImg = KNOWN_SPEAKER_IMAGES['spk-imam-hossain'];
+      } else if (item.speakerName && item.speakerName.includes('আহমাদুল্লাহ সালাফি')) {
+        spkImg = KNOWN_SPEAKER_IMAGES['spk-ahmadullah-salafi'];
+      } else if (item.speakerName && item.speakerName.includes('আবদুস সামাদ')) {
+        spkImg = KNOWN_SPEAKER_IMAGES['spk-abdus-samad-salafi'];
+      } else if (item.speakerName && item.speakerName.includes('আমানুল্লাহ')) {
+        spkImg = KNOWN_SPEAKER_IMAGES['spk-amanullah-bin-ismail'];
+      }
+      return {
+        ...item,
+        speakerImage: spkImg,
+        audioUrl: normalizeAudioUrl(item.audioUrl),
+      };
+    });
 
   const rawCategories: Category[] = Array.isArray(raw.categories) ? raw.categories : CATEGORIES_DATA;
   const rawSpeakers: Speaker[] = Array.isArray(raw.speakers) ? raw.speakers : SPEAKERS_DATA;
 
-  // Clone speakers and dynamically update totalAudios based on actual items in catalog
+  // Clone speakers and dynamically update totalAudios and guarantee verified local portraits
   const speakers: Speaker[] = rawSpeakers.map((spk) => {
     const count = audios.filter(
       (a) => a.speakerId === spk.id || a.speakerName.trim() === spk.name.trim()
     ).length;
+
+    let image = spk.image;
+    if (KNOWN_SPEAKER_IMAGES[spk.id]) {
+      image = KNOWN_SPEAKER_IMAGES[spk.id];
+    } else if (spk.name && spk.name.includes('সাইফুদ্দিন বিলাল')) {
+      image = KNOWN_SPEAKER_IMAGES['spk-saifuddin-bilal-madani'];
+    } else if (spk.name && spk.name.includes('আব্দুল্লাহ শাহেদ')) {
+      image = KNOWN_SPEAKER_IMAGES['spk-abdullah-shahed-madani'];
+    } else if (spk.name && spk.name.includes('আব্দুর রাজ্জাক')) {
+      image = KNOWN_SPEAKER_IMAGES['spk-abdur-razzaq-bin-yousuf'];
+    } else if (spk.name && (spk.name.includes('মোজাফফর') || spk.name.includes('মুজাফফর'))) {
+      image = KNOWN_SPEAKER_IMAGES['spk-muzaffar-bin-mohsin'];
+    } else if (spk.name && spk.name.includes('আব্দুল্লাহ ফারুক')) {
+      image = KNOWN_SPEAKER_IMAGES['spk-abdullah-faruq'];
+    } else if (spk.name && (spk.name.includes('আকরামুজ্জামান') || spk.name.includes('আকরামুজ্জাম্মান'))) {
+      image = KNOWN_SPEAKER_IMAGES['spk-akramuzzaman-bin-abdus-salam'];
+    } else if (spk.name && spk.name.includes('ইমাম হুসাইন')) {
+      image = KNOWN_SPEAKER_IMAGES['spk-imam-hossain'];
+    } else if (spk.name && spk.name.includes('আহমাদুল্লাহ সালাফি')) {
+      image = KNOWN_SPEAKER_IMAGES['spk-ahmadullah-salafi'];
+    } else if (spk.name && spk.name.includes('আবদুস সামাদ')) {
+      image = KNOWN_SPEAKER_IMAGES['spk-abdus-samad-salafi'];
+    } else if (spk.name && spk.name.includes('আমানুল্লাহ')) {
+      image = KNOWN_SPEAKER_IMAGES['spk-amanullah-bin-ismail'];
+    }
+
     return {
       ...spk,
+      image,
       totalAudios: count > 0 ? count : (spk.totalAudios || 0),
     };
   });
@@ -126,11 +201,35 @@ export function normalizeCatalog(raw: any): AudioCatalog {
   // Ensure any speaker appearing in an audio but not in speakers list is added
   for (const a of audios) {
     if (a.speakerName && !speakers.some((s) => s.id === a.speakerId || s.name.trim() === a.speakerName.trim())) {
+      let spkImg = a.speakerImage || './speakers/speaker_1_abu_bakar_zakaria.jpg';
+      if (a.speakerId && KNOWN_SPEAKER_IMAGES[a.speakerId]) {
+        spkImg = KNOWN_SPEAKER_IMAGES[a.speakerId];
+      } else if (a.speakerName.includes('সাইফুদ্দিন বিলাল')) {
+        spkImg = KNOWN_SPEAKER_IMAGES['spk-saifuddin-bilal-madani'];
+      } else if (a.speakerName.includes('আব্দুল্লাহ শাহেদ')) {
+        spkImg = KNOWN_SPEAKER_IMAGES['spk-abdullah-shahed-madani'];
+      } else if (a.speakerName.includes('আব্দুর রাজ্জাক')) {
+        spkImg = KNOWN_SPEAKER_IMAGES['spk-abdur-razzaq-bin-yousuf'];
+      } else if (a.speakerName.includes('মোজাফফর') || a.speakerName.includes('মুজাফফর')) {
+        spkImg = KNOWN_SPEAKER_IMAGES['spk-muzaffar-bin-mohsin'];
+      } else if (a.speakerName.includes('আব্দুল্লাহ ফারুক')) {
+        spkImg = KNOWN_SPEAKER_IMAGES['spk-abdullah-faruq'];
+      } else if (a.speakerName.includes('আকরামুজ্জামান') || a.speakerName.includes('আকরামুজ্জাম্মান')) {
+        spkImg = KNOWN_SPEAKER_IMAGES['spk-akramuzzaman-bin-abdus-salam'];
+      } else if (a.speakerName.includes('ইমাম হুসাইন')) {
+        spkImg = KNOWN_SPEAKER_IMAGES['spk-imam-hossain'];
+      } else if (a.speakerName.includes('আহমাদুল্লাহ সালাফি')) {
+        spkImg = KNOWN_SPEAKER_IMAGES['spk-ahmadullah-salafi'];
+      } else if (a.speakerName.includes('আবদুস সামাদ')) {
+        spkImg = KNOWN_SPEAKER_IMAGES['spk-abdus-samad-salafi'];
+      } else if (a.speakerName.includes('আমানুল্লাহ')) {
+        spkImg = KNOWN_SPEAKER_IMAGES['spk-amanullah-bin-ismail'];
+      }
       speakers.push({
         id: a.speakerId || `spk-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
         name: a.speakerName,
         title: 'ইসলামিক আলোচক',
-        image: a.speakerImage || './speakers/speaker_1_abu_bakar_zakaria.jpg',
+        image: spkImg,
         bio: `${a.speakerName} এর গুরুত্বপূর্ণ ইসলামিক আলোচনা ও বয়ান।`,
         totalAudios: audios.filter((item) => item.speakerName === a.speakerName).length,
         category: a.category || 'সাধারণ আলোচনা',
